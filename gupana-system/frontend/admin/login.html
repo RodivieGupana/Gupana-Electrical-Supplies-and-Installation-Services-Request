@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Login | Gupana Electrical Supplies</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../shared/css/theme.css">
+</head>
+<body>
+<div class="auth-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="mark">G</div>
+      <div><b>GUPANA ELECTRICAL SUPPLIES</b><span>Installation Services</span></div>
+    </div>
+    <div class="login-title">Administrator Login</div>
+    <div class="login-sub">Sign in to manage requests, appointments, and inquiries.</div>
+    <div class="login-error" id="loginError"></div>
+    <form id="loginForm">
+      <div class="field"><label>Email address</label><input type="email" id="loginEmail" placeholder="admin@gupana.com" required/></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••" required/></div>
+      <button type="submit" class="btn btn-primary">Sign In</button>
+    </form>
+    <div class="login-demo"><b>Demo credentials:</b> admin@gupana.com / Admin@123<br/>If no backend is running at the configured API URL, the dashboard opens automatically with sample data so you can preview the interface.</div>
+  </div>
+</div>
+
+<script src="../shared/js/core.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errBox = document.getElementById('loginError');
+  errBox.style.display = 'none';
+  await tryConnectBackend();
+
+  if (DEMO_MODE) {
+    if (email && password) {
+      setSession('admin', 'demo-token', { user_id: 1, role: 'admin', full_name: 'Administrator', email: 'admin@gupana.com' });
+      window.location.href = 'dashboard.html';
+    } else { errBox.textContent = 'Enter an email and password to preview the demo.'; errBox.style.display = 'block'; }
+    return;
+  }
+  try {
+    const data = await api('/auth/login', { method:'POST', body: JSON.stringify({ email, password }) }, 'admin');
+    if (data.user.role !== 'admin') { errBox.textContent = 'This login is for administrators only.'; errBox.style.display = 'block'; return; }
+    setSession('admin', data.token, data.user);
+    window.location.href = 'dashboard.html';
+  } catch (err) { errBox.textContent = err.message || 'Invalid email or password.'; errBox.style.display = 'block'; }
+});
+
+// Already logged in? Skip straight to dashboard.
+if (getToken('admin') && getUser('admin')) window.location.href = 'dashboard.html';
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>More | Gupana Admin</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../shared/css/theme.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body data-page="more">
+<div class="demo-banner" id="demoBanner">Demo mode — no backend connected. Showing sample data. Set API_BASE_URL in shared/js/core.js to connect your server.</div>
+<div id="topbar-mount"></div>
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="shell">
+  <div id="sidebar-mount"></div>
+  <div class="main">
+    <div class="page-head"><div><h1 class="page-title">More</h1><p class="page-sub">Everything else in one place</p></div></div>
+    <div class="grid grid-2" style="grid-template-columns:repeat(2,1fr);">
+      <a href="users.html" class="card card-pad" style="display:flex; align-items:center; gap:12px;"><div class="stat-icon c-green" style="background:var(--green-bg); color:var(--green-fg);"><i data-lucide="users" width="18" height="18"></i></div><div><b>Users</b><div class="cell-muted">Manage client accounts</div></div></a>
+      <a href="services.html" class="card card-pad" style="display:flex; align-items:center; gap:12px;"><div class="stat-icon c-green" style="background:var(--green-bg); color:var(--green-fg);"><i data-lucide="wrench" width="18" height="18"></i></div><div><b>Services</b><div class="cell-muted">Manage service catalog</div></div></a>
+      <a href="appointments.html" class="card card-pad" style="display:flex; align-items:center; gap:12px;"><div class="stat-icon c-blue" style="background:var(--blue-bg); color:var(--blue-fg);"><i data-lucide="calendar" width="18" height="18"></i></div><div><b>Appointments</b><div class="cell-muted">Confirmed schedule</div></div></a>
+      <a href="notifications.html" class="card card-pad" style="display:flex; align-items:center; gap:12px;"><div class="stat-icon c-red" style="background:var(--red-bg); color:var(--red-fg);"><i data-lucide="bell" width="18" height="18"></i></div><div><b>Notifications</b><div class="cell-muted">System alerts</div></div></a>
+      <a href="reports.html" class="card card-pad" style="display:flex; align-items:center; gap:12px;"><div class="stat-icon c-purple" style="background:var(--purple-bg); color:var(--purple-fg);"><i data-lucide="bar-chart-3" width="18" height="18"></i></div><div><b>Reports</b><div class="cell-muted">Generate reports</div></div></a>
+      <a href="activity.html" class="card card-pad" style="display:flex; align-items:center; gap:12px;"><div class="stat-icon c-amber" style="background:var(--amber-bg); color:var(--amber-fg);"><i data-lucide="activity" width="18" height="18"></i></div><div><b>Activity Logs</b><div class="cell-muted">Admin action history</div></div></a>
+      <a href="settings.html" class="card card-pad" style="display:flex; align-items:center; gap:12px; grid-column:1/-1;"><div class="stat-icon c-green" style="background:var(--green-bg); color:var(--green-fg);"><i data-lucide="settings" width="18" height="18"></i></div><div><b>Settings</b><div class="cell-muted">Your administrator account</div></div></a>
+    </div>
+  </div>
+</div>
+<div id="bottomnav-mount"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="../shared/js/core.js"></script>
+<script src="../shared/js/demo-data.js"></script>
+<script src="../shared/js/admin-shell.js"></script>
+<script>initAdminPage();</script>
+</body>
+</html>

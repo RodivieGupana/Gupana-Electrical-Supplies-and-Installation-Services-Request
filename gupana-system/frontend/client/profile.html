@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Profile | Gupana</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../shared/css/theme.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body data-page="profile">
+<div class="demo-banner" id="demoBanner">Demo mode — no backend connected. Showing sample data. Set API_BASE_URL in shared/js/core.js to connect your server.</div>
+<div id="topbar-mount"></div>
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="shell">
+  <div id="sidebar-mount"></div>
+  <div class="main" id="mainContent"><div class="empty-state">Loading…</div></div>
+</div>
+<div id="bottomnav-mount"></div>
+
+<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="../shared/js/core.js"></script>
+<script src="../shared/js/demo-data.js"></script>
+<script src="../shared/js/client-shell.js"></script>
+<script src="../shared/js/client-pages.js"></script>
+<script>initProfilePage();</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login | Gupana Electrical Supplies</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../shared/css/theme.css">
+</head>
+<body>
+<div class="auth-screen">
+  <div class="login-card">
+    <div class="login-logo"><div class="mark">G</div><div><b>GUPANA ELECTRICAL SUPPLIES</b><span>Installation Services</span></div></div>
+    <div class="login-title">Welcome Back</div>
+    <div class="login-sub">Sign in to request services and track your appointments.</div>
+    <div class="login-error" id="loginError"></div>
+    <form id="loginForm">
+      <div class="field"><label>Email address</label><input type="email" id="loginEmail" placeholder="you@example.com" required/></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••" required/></div>
+      <button type="submit" class="btn btn-primary">Sign In</button>
+    </form>
+    <div class="login-switch">Don't have an account? <a href="register.html">Create one</a></div>
+    <div class="login-demo"><b>Demo credentials:</b> juan.delacruz@example.com / Client@123<br/>No backend running? The app opens automatically with sample data to preview the interface.</div>
+  </div>
+</div>
+
+<script src="../shared/js/core.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errBox = document.getElementById('loginError');
+  errBox.style.display = 'none';
+  await tryConnectBackend();
+
+  if (DEMO_MODE) {
+    if (email && password) {
+      setSession('client', 'demo-token', { user_id: 2, role: 'client', full_name: 'Juan Dela Cruz', email, phone_number: '0917-111-2222', address: 'Purok 1, Poblacion, Borobo' });
+      window.location.href = 'dashboard.html';
+    } else { errBox.textContent = 'Enter an email and password to preview the demo.'; errBox.style.display = 'block'; }
+    return;
+  }
+  try {
+    const data = await api('/auth/login', { method:'POST', body: JSON.stringify({ email, password }) }, 'client');
+    if (data.user.role !== 'client') { errBox.textContent = 'This login is for clients only.'; errBox.style.display = 'block'; return; }
+    setSession('client', data.token, data.user);
+    window.location.href = 'dashboard.html';
+  } catch (err) { errBox.textContent = err.message || 'Invalid email or password.'; errBox.style.display = 'block'; }
+});
+
+if (getToken('client') && getUser('client')) window.location.href = 'dashboard.html';
+</script>
+</body>
+</html>

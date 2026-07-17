@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create Account | Gupana Electrical Supplies</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../shared/css/theme.css">
+</head>
+<body>
+<div class="auth-screen">
+  <div class="login-card">
+    <div class="login-logo"><div class="mark">G</div><div><b>GUPANA ELECTRICAL SUPPLIES</b><span>Installation Services</span></div></div>
+    <div class="login-title">Create Your Account</div>
+    <div class="login-sub">Sign up to request electrical services near you.</div>
+    <div class="login-error" id="registerError"></div>
+    <form id="registerForm">
+      <div class="field"><label>Full name</label><input id="regName" required/></div>
+      <div class="field"><label>Email address</label><input type="email" id="regEmail" required/></div>
+      <div class="field"><label>Phone number</label><input id="regPhone"/></div>
+      <div class="field"><label>Address</label><input id="regAddress" placeholder="Purok, Barangay, Municipality"/></div>
+      <div class="field"><label>Password</label><input type="password" id="regPassword" required/></div>
+      <button type="submit" class="btn btn-primary">Create Account</button>
+    </form>
+    <div class="login-switch">Already have an account? <a href="login.html">Sign in</a></div>
+  </div>
+</div>
+
+<script src="../shared/js/core.js"></script>
+<script>
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errBox = document.getElementById('registerError');
+  errBox.style.display = 'none';
+  await tryConnectBackend();
+  const payload = {
+    full_name: document.getElementById('regName').value,
+    email: document.getElementById('regEmail').value,
+    phone_number: document.getElementById('regPhone').value,
+    address: document.getElementById('regAddress').value,
+    password: document.getElementById('regPassword').value,
+  };
+  if (DEMO_MODE) {
+    setSession('client', 'demo-token', { user_id: 2, role: 'client', full_name: payload.full_name, email: payload.email, phone_number: payload.phone_number, address: payload.address });
+    window.location.href = 'dashboard.html';
+    return;
+  }
+  try {
+    const data = await api('/auth/register', { method:'POST', body: JSON.stringify(payload) }, 'client');
+    setSession('client', data.token, data.user);
+    window.location.href = 'dashboard.html';
+  } catch (err) { errBox.textContent = err.message || 'Could not create account.'; errBox.style.display = 'block'; }
+});
+</script>
+</body>
+</html>
