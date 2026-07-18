@@ -76,7 +76,7 @@ All routes except `/auth/*`, `GET /services`, and `GET /schedule-blocks` require
 Open `frontend/admin.html` and `frontend/client.html` and change one line near the top of the `<script>` block:
 
 ```js
-const API_BASE_URL = "https://gupana-electrical-supplies-and-installation-services-request.onrender.com/api"; // change this to your deployed backend URL
+const API_BASE_URL = "https://gupana-electrical-supplies-and.onrender.com/api"; // change this to your deployed backend URL
 ```
 
 Then also set `CLIENT_ORIGIN` in the backend `.env` to wherever you're hosting/opening these files from, so CORS allows the requests.

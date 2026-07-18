@@ -4,7 +4,7 @@
    Include this file first, before demo-data.js and the page-specific script.
    ============================================================================ */
 
-const API_BASE_URL = "https://gupana-electrical-supplies-and-installation-services-request.onrender.com/api"; // change this to your deployed backend URL
+const API_BASE_URL = "https://gupana-electrical-supplies-and.onrender.com/api"; // change this to your deployed backend URL
 let DEMO_MODE = false;
 
 /** Reads the token/user for the given role ('admin' or 'client') from localStorage. */
