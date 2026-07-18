@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gupana | Electrical Supplies &amp; Installation Services</title>
+<link rel="icon" href="data:,">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+:root{
+  --green-900:#0a3622; --green-800:#0d4229; --green-700:#125c37;
+  --yellow:#ffd400; --yellow-dark:#e6bf00;
+  --ink:#152318; --muted:#6b7a70; --line:#e6ece7; --bg:#f4f7f5; --card:#ffffff;
+  --amber-bg:#fff6da; --amber-fg:#a5690a;
+  --green-bg:#e2f7ea; --green-fg:#0f8a44;
+  --blue-bg:#e6f0ff; --blue-fg:#2064d6;
+  --red-bg:#fde7e7; --red-fg:#c0332e;
+  --purple-bg:#f1e9ff; --purple-fg:#7a3fe0;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(10,54,34,.06), 0 8px 24px -12px rgba(10,54,34,.12);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased;}
+a{color:inherit; text-decoration:none;}
+button{font-family:inherit; cursor:pointer;}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:#cfd9d2;border-radius:8px;}
+
+#loginScreen{min-height:100vh; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 20% 20%, #124a2c, var(--green-900) 60%); padding:24px;}
+.login-card{width:100%; max-width:400px; background:var(--card); border-radius:20px; padding:36px 32px; box-shadow:0 30px 60px -20px rgba(0,0,0,.5);}
+.login-logo{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+.login-logo .mark{width:44px; height:44px; border-radius:10px; background:var(--green-900); display:flex; align-items:center; justify-content:center; color:var(--yellow); font-weight:800; font-size:20px;}
+.login-logo b{font-size:16px; letter-spacing:.3px; line-height:1.1; display:block;}
+.login-logo span{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px;}
+.login-title{font-size:22px; font-weight:800; margin:22px 0 4px;}
+.login-sub{color:var(--muted); font-size:13.5px; margin-bottom:22px;}
+.login-switch{text-align:center; font-size:13px; color:var(--muted); margin-top:16px;}
+.login-switch a{color:var(--green-700); font-weight:700;}
+.field{margin-bottom:16px;}
+.field label{display:block; font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:6px;}
+.field input, .field textarea, .field select{width:100%; padding:11px 13px; border:1.5px solid var(--line); border-radius:10px; font-size:14px; background:#fbfdfc; transition:border .15s;}
+.field input:focus, .field textarea:focus, .field select:focus{outline:none; border-color:var(--green-700); background:#fff;}
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 18px; border-radius:10px; border:none; font-weight:700; font-size:13.5px; transition:filter .12s, transform .05s;}
+.btn:active{transform:translateY(1px);}
+.btn-primary{background:var(--green-900); color:#fff; width:100%;}
+.btn-primary:hover{filter:brightness(1.15);}
+.btn-yellow{background:var(--yellow); color:var(--green-900);}
+.btn-yellow:hover{background:var(--yellow-dark);}
+.btn-outline{background:#fff; border:1.5px solid var(--line); color:var(--ink);}
+.btn-outline:hover{border-color:var(--green-700);}
+.btn-sm{padding:7px 12px; font-size:12.5px; border-radius:8px;}
+.login-demo{margin-top:18px; padding:12px 14px; background:#f6faf7; border:1px dashed var(--line); border-radius:10px; font-size:12px; color:var(--muted); line-height:1.6;}
+.login-error{background:var(--red-bg); color:var(--red-fg); font-size:12.5px; padding:9px 12px; border-radius:8px; margin-bottom:14px; display:none;}
+
+#app{display:none; min-height:100vh;}
+.topbar{position:sticky; top:0; z-index:40; height:64px; background:var(--green-900); display:flex; align-items:center; gap:14px; padding:0 18px; color:#fff;}
+.hamburger{display:none; background:transparent; border:none; color:#fff; padding:6px; border-radius:8px;}
+.hamburger:hover{background:rgba(255,255,255,.1);}
+.topbar-logo{display:flex; align-items:center; gap:10px;}
+.topbar-logo .mark{width:34px; height:34px; border-radius:9px; background:var(--yellow); color:var(--green-900); font-weight:800; display:flex; align-items:center; justify-content:center; font-size:16px;}
+.topbar-logo b{color:var(--yellow); font-size:14px; letter-spacing:.3px; display:block; line-height:1.15;}
+.topbar-logo span{font-size:9.5px; color:#cfe9da; letter-spacing:.8px; text-transform:uppercase;}
+.topbar-spacer{flex:1;}
+.icon-btn{position:relative; width:38px; height:38px; border-radius:10px; border:none; background:rgba(255,255,255,.08); color:#fff; display:flex; align-items:center; justify-content:center;}
+.icon-btn:hover{background:rgba(255,255,255,.18);}
+.icon-badge{position:absolute; top:-4px; right:-4px; background:var(--red-fg); color:#fff; font-size:10px; font-weight:800; min-width:17px; height:17px; border-radius:9px; display:flex; align-items:center; justify-content:center; padding:0 4px; border:2px solid var(--green-900);}
+.user-chip{display:flex; align-items:center; gap:9px; padding:6px 10px 6px 6px; border-radius:12px; background:rgba(255,255,255,.06); border:none; color:#fff;}
+.user-chip:hover{background:rgba(255,255,255,.14);}
+.user-avatar{width:30px; height:30px; border-radius:50%; background:var(--yellow); color:var(--green-900); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12.5px;}
+.user-chip .u-name{font-size:12.5px; font-weight:700; line-height:1.2;}
+.user-chip .u-role{font-size:10.5px; color:#bcd8c8; text-transform:capitalize;}
+
+.shell{display:flex;}
+.sidebar{width:220px; flex-shrink:0; background:#fff; border-right:1px solid var(--line); min-height:calc(100vh - 64px); padding:16px 12px; position:sticky; top:64px; align-self:flex-start; height:calc(100vh - 64px); overflow-y:auto;}
+.nav-item{display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:10px; color:#3d4a41; font-size:13.5px; font-weight:600; margin-bottom:2px; border:none; background:transparent; width:100%; text-align:left;}
+.nav-item svg{width:17px; height:17px; flex-shrink:0;}
+.nav-item:hover{background:#f0f5f1;}
+.nav-item.active{background:var(--green-900); color:#fff;}
+
+.main{flex:1; padding:22px 24px 90px; min-width:0;}
+.page-head{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px;}
+.page-title{font-size:22px; font-weight:800; margin:0;}
+.page-sub{color:var(--muted); font-size:13px; margin:2px 0 0;}
+
+.grid{display:grid; gap:16px;}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+.grid-2{grid-template-columns:1.3fr 1fr;}
+.grid-serv{grid-template-columns:repeat(4,1fr);}
+@media (max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr);} .grid-2{grid-template-columns:1fr;} .grid-serv{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:640px){.grid-4{grid-template-columns:repeat(2,1fr);} .grid-serv{grid-template-columns:repeat(2,1fr);}}
+
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);}
+.card-pad{padding:18px 20px;}
+.card-head{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--line);}
+.card-head h3{margin:0; font-size:14.5px; font-weight:800;}
+.link-sm{font-size:12px; font-weight:700; color:var(--green-700);}
+
+.stat{padding:18px; display:flex; flex-direction:column; gap:10px;}
+.stat-icon{width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center;}
+.stat-icon svg{width:19px;height:19px;}
+.stat-val{font-size:24px; font-weight:800; line-height:1;}
+.stat-label{font-size:12px; color:var(--muted); font-weight:600;}
+.stat-link{font-size:11.5px; font-weight:700; color:var(--green-700); margin-top:-2px;}
+.c-green .stat-icon{background:var(--green-bg); color:var(--green-fg);}
+.c-amber .stat-icon{background:var(--amber-bg); color:var(--amber-fg);}
+.c-blue .stat-icon{background:var(--blue-bg); color:var(--blue-fg);}
+.c-purple .stat-icon{background:var(--purple-bg); color:var(--purple-fg);}
+
+.hero-cta{background:linear-gradient(135deg,var(--green-900),var(--green-700)); border-radius:16px; padding:22px 24px; color:#fff; margin-bottom:18px;}
+.hero-cta h2{margin:0 0 4px; font-size:18px;}
+.hero-cta p{margin:0 0 14px; font-size:13px; color:#cfe9da;}
+
+table{width:100%; border-collapse:collapse; font-size:13px;}
+th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:#8a988e; padding:10px 20px; border-bottom:1px solid var(--line); white-space:nowrap;}
+td{padding:12px 20px; border-bottom:1px solid #f0f3f1; vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:#fafcfa;}
+.cell-strong{font-weight:700;}
+.cell-muted{color:var(--muted); font-size:12px;}
+
+.badge{display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; text-transform:capitalize;}
+.badge-pending{background:var(--amber-bg); color:var(--amber-fg);}
+.badge-approved,.badge-confirmed,.badge-completed,.badge-answered{background:var(--green-bg); color:var(--green-fg);}
+.badge-cancelled,.badge-unanswered{background:var(--red-bg); color:var(--red-fg);}
+
+.tabs{display:flex; gap:6px; flex-wrap:wrap; padding:14px 20px 0;}
+.tab{padding:7px 14px; border-radius:9px; font-size:12.5px; font-weight:700; border:1.5px solid var(--line); background:#fff; color:var(--muted);}
+.tab.active{background:var(--green-900); color:#fff; border-color:var(--green-900);}
+.toolbar{display:flex; align-items:center; gap:10px; padding:14px 20px; flex-wrap:wrap;}
+.search-box{flex:1; min-width:180px; display:flex; align-items:center; gap:8px; border:1.5px solid var(--line); border-radius:9px; padding:8px 12px; background:#fbfdfc;}
+.search-box input{border:none; background:transparent; outline:none; font-size:13px; width:100%;}
+.search-box svg{width:15px;height:15px;color:#9caea2;}
+
+.empty-state{padding:50px 20px; text-align:center; color:var(--muted);}
+.empty-state svg{width:34px;height:34px; margin-bottom:10px; color:#c3cec6;}
+
+.modal-overlay{position:fixed; inset:0; background:rgba(10,20,14,.5); display:none; align-items:center; justify-content:center; z-index:100; padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff; border-radius:16px; width:100%; max-width:460px; max-height:88vh; overflow-y:auto; box-shadow:0 30px 70px -20px rgba(0,0,0,.5);}
+.modal-head{display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--line);}
+.modal-head h3{margin:0; font-size:15.5px; font-weight:800;}
+.modal-close{width:30px; height:30px; border-radius:8px; border:none; background:#f2f6f3; display:flex; align-items:center; justify-content:center;}
+.modal-body{padding:18px 20px;}
+.modal-foot{display:flex; gap:10px; padding:16px 20px; border-top:1px solid var(--line);}
+.modal-foot .btn{flex:1;}
+
+.toast-wrap{position:fixed; bottom:22px; right:22px; z-index:200; display:flex; flex-direction:column; gap:10px;}
+.toast{background:var(--green-900); color:#fff; padding:12px 16px; border-radius:10px; font-size:13px; font-weight:600; box-shadow:0 15px 30px -10px rgba(0,0,0,.4); display:flex; align-items:center; gap:8px; min-width:220px; animation:slideIn .25s ease;}
+.toast.error{background:var(--red-fg);}
+@keyframes slideIn{from{transform:translateX(30px); opacity:0;} to{transform:translateX(0); opacity:1;}}
+
+.demo-banner{background:var(--yellow); color:var(--green-900); font-size:12px; font-weight:700; text-align:center; padding:7px; display:none;}
+.drawer-overlay{position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:60; display:none;}
+.drawer-overlay.open{display:block;}
+
+.bottom-nav{display:none; position:fixed; bottom:0; left:0; right:0; z-index:50; background:#fff; border-top:1px solid var(--line); padding:8px 4px 10px; gap:2px;}
+.bottom-nav-item{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10px; font-weight:700; color:#8a988e; border:none; background:transparent; padding:4px;}
+.bottom-nav-item svg{width:19px;height:19px;}
+.bottom-nav-item.active{color:var(--green-900);}
+
+.service-tile{border:1px solid var(--line); border-radius:12px; padding:18px; text-align:left; background:#fff; cursor:pointer;}
+.service-tile:hover{border-color:var(--green-700);}
+.service-tile .s-icon{width:38px;height:38px;border-radius:10px;background:var(--green-bg);color:var(--green-fg);display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.service-tile .s-icon svg{width:19px;height:19px;}
+.service-tile h4{margin:0 0 5px; font-size:13.5px;}
+.service-tile p{margin:0; font-size:11.5px; color:var(--muted); line-height:1.5;}
+
+.feature-strip{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:18px;}
+@media (max-width:900px){.feature-strip{grid-template-columns:1fr;}}
+.feature-tile{display:flex; gap:12px; padding:16px; background:#fff; border:1px solid var(--line); border-radius:12px;}
+.feature-tile .f-icon{width:36px;height:36px;border-radius:9px;background:var(--green-bg);color:var(--green-fg);display:flex;align-items:center;justify-content:center; flex-shrink:0;}
+.feature-tile h5{margin:0 0 3px; font-size:13px;}
+.feature-tile p{margin:0; font-size:11.5px; color:var(--muted); line-height:1.5;}
+
+@media (max-width:900px){
+  .sidebar{position:fixed; left:-260px; top:0; height:100vh; z-index:70; transition:left .2s; padding-top:76px; width:250px;}
+  .sidebar.open{left:0; box-shadow:20px 0 40px rgba(0,0,0,.2);}
+  .hamburger{display:flex; align-items:center; justify-content:center;}
+  .main{padding:16px 14px 90px;}
+  .bottom-nav{display:flex;}
+  .topbar-logo b{font-size:12.5px;}
+  .topbar-logo span{display:none;}
+  .user-chip .u-name, .user-chip .u-role{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="demo-banner" id="demoBanner">Demo mode — no backend connected. Showing sample data. Set API_BASE_URL in the script to connect your server.</div>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="loginScreen">
+  <div class="login-card" id="loginCard">
+    <div class="login-logo">
+      <div class="mark">G</div>
+      <div><b>GUPANA ELECTRICAL SUPPLIES</b><span>Installation Services</span></div>
+    </div>
+    <div class="login-title">Welcome Back</div>
+    <div class="login-sub">Sign in to request services and track your appointments.</div>
+    <div class="login-error" id="loginError"></div>
+    <form id="loginForm">
+      <div class="field"><label>Email address</label><input type="email" id="loginEmail" placeholder="you@example.com" required/></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••" required/></div>
+      <button type="submit" class="btn btn-primary">Sign In</button>
+    </form>
+    <div class="login-switch">Don't have an account? <a onclick="showRegister()">Create one</a></div>
+    <div class="login-demo"><b>Demo credentials:</b> juan.delacruz@example.com / Client@123<br/>No backend running? The app opens automatically with sample data to preview the interface.</div>
+  </div>
+
+  <div class="login-card" id="registerCard" style="display:none;">
+    <div class="login-logo">
+      <div class="mark">G</div>
+      <div><b>GUPANA ELECTRICAL SUPPLIES</b><span>Installation Services</span></div>
+    </div>
+    <div class="login-title">Create Your Account</div>
+    <div class="login-sub">Sign up to request electrical services near you.</div>
+    <div class="login-error" id="registerError"></div>
+    <form id="registerForm">
+      <div class="field"><label>Full name</label><input id="regName" required/></div>
+      <div class="field"><label>Email address</label><input type="email" id="regEmail" required/></div>
+      <div class="field"><label>Phone number</label><input id="regPhone"/></div>
+      <div class="field"><label>Address</label><input id="regAddress" placeholder="Purok, Barangay, Municipality"/></div>
+      <div class="field"><label>Password</label><input type="password" id="regPassword" required/></div>
+      <button type="submit" class="btn btn-primary">Create Account</button>
+    </form>
+    <div class="login-switch">Already have an account? <a onclick="showLogin()">Sign in</a></div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app">
+  <div class="topbar">
+    <button class="hamburger" id="hamburgerBtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <div class="topbar-logo"><div class="mark">G</div><div><b>GUPANA ELECTRICAL SUPPLIES</b><span>Installation Services</span></div></div>
+    <div class="topbar-spacer"></div>
+    <button class="icon-btn" id="notifBtn" title="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="icon-badge" id="notifBadge" style="display:none;">0</span>
+    </button>
+    <button class="user-chip" id="userMenuBtn">
+      <div class="user-avatar" id="userAvatar">J</div>
+      <div style="text-align:left;"><div class="u-name" id="userName">Juan Dela Cruz</div><div class="u-role">Client</div></div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+  </div>
+
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <div class="shell">
+    <div class="sidebar" id="sidebar">
+      <button class="nav-item active" data-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard</button>
+      <button class="nav-item" data-view="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Services</button>
+      <button class="nav-item" data-view="requests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Service Requests</button>
+      <button class="nav-item" data-view="appointments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Appointments</button>
+      <button class="nav-item" data-view="inquiries"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Inquiries</button>
+      <button class="nav-item" data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
+      <button class="nav-item" data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</button>
+      <button class="nav-item" id="logoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+    </div>
+
+    <div class="main" id="mainContent"></div>
+  </div>
+
+  <div class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item active" data-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+    <button class="bottom-nav-item" data-view="requests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Requests</button>
+    <button class="bottom-nav-item" data-view="appointments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Appointments</button>
+    <button class="bottom-nav-item" data-view="inquiries"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Inquiries</button>
+    <button class="bottom-nav-item" data-view="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const API_BASE_URL = "http://localhost:4000/api"; // change this to your deployed backend URL
+let DEMO_MODE = false;
+let TOKEN = localStorage.getItem('gupana_client_token') || null;
+let CURRENT_USER = JSON.parse(localStorage.getItem('gupana_client_user') || 'null');
+let CURRENT_VIEW = 'dashboard';
+
+/* ================= DEMO DATA ================= */
+const DEMO = {
+  user: { user_id: 2, role: 'client', full_name: 'Juan Dela Cruz', email: 'juan.delacruz@example.com', phone_number:'0917-111-2222', address:'Purok 1, Poblacion, Borobo' },
+  stats: { my_requests: 2, upcoming_appointments: 1, unanswered_inquiries: 1, unread_notifications: 3 },
+  services: [
+    { service_id: 1, service_name: 'Electrical Installation', category:'Installation', description: 'We provide safe and reliable installation services.', icon: 'home' },
+    { service_id: 2, service_name: 'Electrical Repair', category:'Repair', description: 'We fix electrical issues in your home or business.', icon: 'wrench' },
+    { service_id: 3, service_name: 'Wiring Services', category:'Wiring', description: 'House wiring, rewiring, and new wiring setup.', icon: 'plug' },
+    { service_id: 4, service_name: 'Maintenance', category:'Maintenance', description: 'Preventive maintenance for your electrical systems.', icon: 'settings' },
+  ],
+  requests: [
+    { request_id: 2, request_code:'SR-2025-0002', service_name:'Electrical Installation', status:'pending', created_at:'2025-05-14', problem_description:'Need new outlets installed in the kitchen.', address:'Purok 1, Poblacion, Borobo', block_date:'2025-05-18', start_time:'08:00', end_time:'10:00' },
+    { request_id: 1, request_code:'SR-2025-0001', service_name:'Wiring Repair', status:'approved', created_at:'2025-05-10', problem_description:'Flickering lights in the living room.', address:'Purok 1, Poblacion, Borobo', block_date:'2025-05-12', start_time:'13:00', end_time:'15:00' },
+    { request_id: 3, request_code:'SR-2025-0003', service_name:'Maintenance', status:'completed', created_at:'2025-05-05', problem_description:'Yearly preventive maintenance check-up.', address:'Purok 1, Poblacion, Borobo', block_date:'2025-05-06', start_time:'08:00', end_time:'10:00' },
+  ],
+  appointments: [
+    { appointment_id: 1, service_name:'Electrical Installation', appointment_date:'2025-05-18', start_time:'08:00', end_time:'10:00', status:'confirmed', location:'Purok 1, Poblacion, Borobo', note:'Please make sure someone is available during the schedule.', request_code:'SR-2025-0002' },
+  ],
+  inquiries: [
+    { inquiry_id: 1, inquiry_code:'INQ-2025-0004', subject:'Service Availability', message:'Do you offer weekend appointments for installation services?', status:'unanswered', created_at:'2025-05-15', reply:null },
+    { inquiry_id: 2, inquiry_code:'INQ-2025-0003', subject:'Warranty Inquiry', message:'Is there a warranty on wiring services?', status:'answered', created_at:'2025-05-13', reply:'Yes, all wiring work comes with a 6-month workmanship warranty.' },
+  ],
+  notifications: [
+    { notification_id:1, title:'Appointment Confirmed', message:'Your appointment for request SR-2025-0002 is confirmed on May 18, 2025.', type:'appointment', is_read:false, created_at:'2025-05-15T09:00:00' },
+    { notification_id:2, title:'Inquiry Answered', message:'Your inquiry "Warranty Inquiry" has been answered.', type:'inquiry', is_read:false, created_at:'2025-05-13T14:00:00' },
+    { notification_id:3, title:'Service Request Update', message:'Your request SR-2025-0001 is now approved.', type:'request', is_read:false, created_at:'2025-05-11T11:00:00' },
+  ],
+};
+
+/* ================= API HELPER ================= */
+async function api(path, opts = {}) {
+  if (DEMO_MODE) throw new Error('DEMO_MODE');
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (TOKEN) headers['Authorization'] = `Bearer ${TOKEN}`;
+  const res = await fetch(`${API_BASE_URL}${path}`, { ...opts, headers });
+  let data = null;
+  try { data = await res.json(); } catch (e) {}
+  if (!res.ok) throw new Error((data && data.error) || 'Request failed');
+  return data;
+}
+async function tryConnectBackend() {
+  try {
+    const r = await fetch(`${API_BASE_URL}/health`);
+    if (!r.ok) throw new Error('unreachable');
+    DEMO_MODE = false;
+  } catch (e) {
+    DEMO_MODE = true;
+    document.getElementById('demoBanner').style.display = 'block';
+  }
+}
+
+/* ================= TOAST ================= */
+function toast(msg, isError = false) {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast' + (isError ? ' error' : '');
+  el.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="${isError ? 'M12 8v4M12 16h.01M12 2a10 10 0 100 20 10 10 0 000-20z' : 'M20 6L9 17l-5-5'}"/></svg><span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+/* ================= AUTH ================= */
+function showRegister() { document.getElementById('loginCard').style.display = 'none'; document.getElementById('registerCard').style.display = 'block'; }
+function showLogin() { document.getElementById('registerCard').style.display = 'none'; document.getElementById('loginCard').style.display = 'block'; }
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errBox = document.getElementById('loginError');
+  errBox.style.display = 'none';
+  await tryConnectBackend();
+
+  if (DEMO_MODE) {
+    if (email && password) {
+      CURRENT_USER = DEMO.user; TOKEN = 'demo-token';
+      localStorage.setItem('gupana_client_token', TOKEN);
+      localStorage.setItem('gupana_client_user', JSON.stringify(CURRENT_USER));
+      enterApp();
+    } else { errBox.textContent = 'Enter an email and password to preview the demo.'; errBox.style.display = 'block'; }
+    return;
+  }
+  try {
+    const data = await api('/auth/login', { method:'POST', body: JSON.stringify({ email, password }) });
+    if (data.user.role !== 'client') { errBox.textContent = 'This login is for clients only.'; errBox.style.display='block'; return; }
+    TOKEN = data.token; CURRENT_USER = data.user;
+    localStorage.setItem('gupana_client_token', TOKEN);
+    localStorage.setItem('gupana_client_user', JSON.stringify(CURRENT_USER));
+    enterApp();
+  } catch (err) { errBox.textContent = err.message || 'Invalid email or password.'; errBox.style.display = 'block'; }
+});
+
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errBox = document.getElementById('registerError');
+  errBox.style.display = 'none';
+  await tryConnectBackend();
+  const payload = {
+    full_name: document.getElementById('regName').value,
+    email: document.getElementById('regEmail').value,
+    phone_number: document.getElementById('regPhone').value,
+    address: document.getElementById('regAddress').value,
+    password: document.getElementById('regPassword').value,
+  };
+  if (DEMO_MODE) {
+    CURRENT_USER = { ...DEMO.user, full_name: payload.full_name, email: payload.email };
+    TOKEN = 'demo-token';
+    localStorage.setItem('gupana_client_token', TOKEN);
+    localStorage.setItem('gupana_client_user', JSON.stringify(CURRENT_USER));
+    enterApp();
+    return;
+  }
+  try {
+    const data = await api('/auth/register', { method:'POST', body: JSON.stringify(payload) });
+    TOKEN = data.token; CURRENT_USER = data.user;
+    localStorage.setItem('gupana_client_token', TOKEN);
+    localStorage.setItem('gupana_client_user', JSON.stringify(CURRENT_USER));
+    enterApp();
+  } catch (err) { errBox.textContent = err.message || 'Could not create account.'; errBox.style.display = 'block'; }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  TOKEN = null; CURRENT_USER = null;
+  localStorage.removeItem('gupana_client_token'); localStorage.removeItem('gupana_client_user');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  showLogin();
+});
+
+function enterApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('userName').textContent = CURRENT_USER.full_name;
+  document.getElementById('userAvatar').textContent = CURRENT_USER.full_name.charAt(0).toUpperCase();
+  lucide.createIcons();
+  navigate('dashboard');
+}
+
+/* ================= NAVIGATION ================= */
+document.querySelectorAll('.nav-item[data-view], .bottom-nav-item[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => { navigate(btn.dataset.view); closeSidebar(); });
+});
+document.getElementById('hamburgerBtn').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+});
+document.getElementById('drawerOverlay').addEventListener('click', closeSidebar);
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('open'); }
+
+function setActiveNav(view) {
+  document.querySelectorAll('.nav-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  document.querySelectorAll('.bottom-nav-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+}
+async function navigate(view) {
+  CURRENT_VIEW = view;
+  setActiveNav(view);
+  const main = document.getElementById('mainContent');
+  main.innerHTML = '<div class="empty-state">Loading…</div>';
+  try {
+    switch (view) {
+      case 'dashboard': await renderDashboard(); break;
+      case 'services': await renderServices(); break;
+      case 'requests': await renderRequests(); break;
+      case 'appointments': await renderAppointments(); break;
+      case 'inquiries': await renderInquiries(); break;
+      case 'profile': await renderProfile(); break;
+      case 'settings': await renderSettings(); break;
+      default: main.innerHTML = '<div class="empty-state">Not found</div>';
+    }
+  } catch (err) { main.innerHTML = `<div class="empty-state">Something went wrong: ${err.message}</div>`; }
+  lucide.createIcons();
+  refreshNotifBadge();
+}
+document.getElementById('notifBtn').addEventListener('click', () => openNotifications());
+document.getElementById('userMenuBtn').addEventListener('click', () => navigate('profile'));
+
+async function refreshNotifBadge() {
+  let count = 0;
+  try { count = DEMO_MODE ? DEMO.notifications.filter(n=>!n.is_read).length : (await api('/notifications/unread-count')).count; } catch(e){}
+  const badge = document.getElementById('notifBadge');
+  if (count > 0) { badge.style.display = 'flex'; badge.textContent = count > 9 ? '9+' : count; } else badge.style.display = 'none';
+}
+
+/* ================= MODAL ================= */
+function openModal(html) { document.getElementById('modalBox').innerHTML = html; document.getElementById('modalOverlay').classList.add('open'); lucide.createIcons(); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') closeModal(); });
+
+function fmtDate(d) { if(!d) return '—'; const dt = new Date(d); return dt.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); }
+function fmtTime(t) { if(!t) return ''; const [h,m] = t.split(':'); const hh = ((+h+11)%12)+1; return `${hh}:${m} ${+h<12?'AM':'PM'}`; }
+function badge(status) { return `<span class="badge badge-${status}">${status}</span>`; }
+async function loadList(demoArr, path) {
+  if (DEMO_MODE) return demoArr;
+  try { return await api(path); } catch (e) { toast(e.message, true); return []; }
+}
+
+/* ================= DASHBOARD ================= */
+async function renderDashboard() {
+  let stats, recentRequests, nextAppointment, services;
+  if (DEMO_MODE) {
+    stats = DEMO.stats; recentRequests = DEMO.requests.slice(0,3); nextAppointment = DEMO.appointments[0]; services = DEMO.services;
+  } else {
+    try {
+      const d = await api('/client-dashboard');
+      stats = d; recentRequests = d.recent_requests; nextAppointment = d.next_appointment;
+      services = await loadList(DEMO.services, '/services?active=true');
+    } catch (e) { toast(e.message, true); return; }
+  }
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="hero-cta">
+      <h2>Hi, ${CURRENT_USER.full_name.split(' ')[0]}! 👋</h2>
+      <p>What service do you need today?</p>
+      <button class="btn btn-yellow" onclick="navigate('requests'); setTimeout(()=>openNewRequestModal(),50);"><i data-lucide="plus" width="15" height="15"></i> Request a Service</button>
+    </div>
+    <div class="grid grid-4" style="margin-bottom:18px;">
+      <div class="card stat c-green"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="stat-val">${stats.my_requests}</div><div class="stat-label">My Requests</div><a class="stat-link" onclick="navigate('requests')">View requests</a></div>
+      <div class="card stat c-amber"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-val">${stats.upcoming_appointments}</div><div class="stat-label">Upcoming Appointment</div><a class="stat-link" onclick="navigate('appointments')">View schedule</a></div>
+      <div class="card stat c-blue"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="stat-val">${stats.unanswered_inquiries}</div><div class="stat-label">Unanswered Inquiries</div><a class="stat-link" onclick="navigate('inquiries')">View inquiries</a></div>
+      <div class="card stat c-purple"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 003.4 0"/></svg></div><div class="stat-val">${stats.unread_notifications}</div><div class="stat-label">Unread Notifications</div><a class="stat-link" onclick="openNotifications()">View all</a></div>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:18px;">
+      <div class="card"><div class="card-head"><h3>Recent Service Requests</h3><a class="link-sm" onclick="navigate('requests')">View All</a></div>
+        <div>${recentRequests.length ? recentRequests.map(r => `
+          <div style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f0f3f1;">
+            <div style="width:34px;height:34px;border-radius:9px;background:var(--blue-bg);color:var(--blue-fg);display:flex;align-items:center;justify-content:center; flex-shrink:0;"><i data-lucide="wrench" width="15" height="15"></i></div>
+            <div style="flex:1; min-width:0;"><div class="cell-strong" style="font-size:13px;">${r.service_name}</div><div class="cell-muted">Request #${r.request_code||r.request_id}</div></div>
+            ${badge(r.status)}
+          </div>`).join('') : `<div class="empty-state">No requests yet.</div>`}
+        </div>
+      </div>
+      <div class="card"><div class="card-head"><h3>Upcoming Appointment</h3><a class="link-sm" onclick="navigate('appointments')">View All</a></div>
+        <div class="card-pad">
+        ${nextAppointment ? `
+          <div class="cell-strong" style="font-size:14px; margin-bottom:8px;">${nextAppointment.service_name||''}</div>
+          <div style="font-size:12.5px; color:var(--muted); display:flex; flex-direction:column; gap:6px; margin-bottom:14px;">
+            <span><i data-lucide="calendar" width="13" height="13" style="vertical-align:-2px;"></i> ${fmtDate(nextAppointment.appointment_date)} ${nextAppointment.appointment_date ? '('+new Date(nextAppointment.appointment_date).toLocaleDateString('en-US',{weekday:'long'})+')' : ''}</span>
+            <span><i data-lucide="clock" width="13" height="13" style="vertical-align:-2px;"></i> ${fmtTime(nextAppointment.start_time)} - ${fmtTime(nextAppointment.end_time)}</span>
+            <span><i data-lucide="map-pin" width="13" height="13" style="vertical-align:-2px;"></i> ${nextAppointment.location||'—'}</span>
+          </div>
+          ${badge(nextAppointment.status)}
+        ` : `<div class="empty-state" style="padding:20px;">No upcoming appointment.</div>`}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Our Services</h3><a class="link-sm" onclick="navigate('services')">View All</a></div>
+      <div class="services-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; padding:18px 20px;">
+        ${services.slice(0,4).map(s => `
+          <div class="service-tile" onclick="openNewRequestModal(${s.service_id})">
+            <div class="s-icon"><i data-lucide="${s.icon||'zap'}"></i></div>
+            <h4>${s.service_name}</h4><p>${s.description||''}</p>
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/* ================= SERVICES ================= */
+async function renderServices() {
+  const services = await loadList(DEMO.services, '/services?active=true');
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head"><div><h1 class="page-title">Services</h1><p class="page-sub">Browse what we offer and request a service</p></div></div>
+    <div class="card"><div class="services-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; padding:20px;">
+      ${services.map(s => `
+        <div class="service-tile" onclick="openNewRequestModal(${s.service_id})">
+          <div class="s-icon"><i data-lucide="${s.icon||'zap'}"></i></div>
+          <h4>${s.service_name}</h4><p>${s.description||''}</p>
+          <button class="btn btn-outline btn-sm" style="margin-top:12px; width:100%;">Request This</button>
+        </div>`).join('') || `<div class="empty-state">No services available.</div>`}
+    </div></div>
+    <div class="feature-strip">
+      <div class="feature-tile"><div class="f-icon"><i data-lucide="file-text" width="17" height="17"></i></div><div><h5>Easy Request</h5><p>Request electrical services in just a few steps.</p></div></div>
+      <div class="feature-tile"><div class="f-icon"><i data-lucide="clock" width="17" height="17"></i></div><div><h5>Track Status</h5><p>Track your request status in real-time.</p></div></div>
+      <div class="feature-tile"><div class="f-icon"><i data-lucide="shield-check" width="17" height="17"></i></div><div><h5>Secure &amp; Reliable</h5><p>Your data is safe and protected.</p></div></div>
+    </div>
+  `;
+}
+
+/* ================= NEW REQUEST ================= */
+async function openNewRequestModal(preselectServiceId) {
+  const services = await loadList(DEMO.services, '/services?active=true');
+  const blocks = await loadList([
+    { block_id:1, block_date:'2025-05-18', start_time:'08:00', end_time:'10:00' },
+    { block_id:2, block_date:'2025-05-19', start_time:'13:00', end_time:'15:00' },
+    { block_id:3, block_date:'2025-05-20', start_time:'10:30', end_time:'12:30' },
+  ], '/schedule-blocks');
+  openModal(`
+    <div class="modal-head"><h3>New Service Request</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <form id="newReqForm">
+      <div class="modal-body">
+        <div class="field"><label>Select Service</label>
+          <select id="nr_service" required>${services.map(s => `<option value="${s.service_id}" ${preselectServiceId===s.service_id?'selected':''}>${s.service_name}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Problem Description</label><textarea id="nr_desc" rows="3" placeholder="Please describe the problem..." required></textarea></div>
+        <div class="field"><label>Preferred Schedule</label>
+          <select id="nr_block">
+            <option value="">No preference</option>
+            ${blocks.map(b => `<option value="${b.block_id}">${fmtDate(b.block_date)} • ${fmtTime(b.start_time)} - ${fmtTime(b.end_time)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label>Service Address</label><input id="nr_address" value="${CURRENT_USER.address||''}" required/></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary">Submit Request</button></div>
+    </form>
+  `);
+  document.getElementById('newReqForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+      service_id: Number(document.getElementById('nr_service').value),
+      problem_description: document.getElementById('nr_desc').value,
+      preferred_block_id: document.getElementById('nr_block').value || null,
+      address: document.getElementById('nr_address').value,
+    };
+    if (DEMO_MODE) { toast('Service request submitted (demo mode).'); closeModal(); return navigate('requests'); }
+    try { await api('/service-requests', { method:'POST', body: JSON.stringify(payload) }); toast('Service request submitted.'); closeModal(); navigate('requests'); }
+    catch (err) { toast(err.message, true); }
+  });
+}
+
+/* ================= SERVICE REQUESTS ================= */
+let reqFilter = 'All';
+async function renderRequests() {
+  const requests = await loadList(DEMO.requests, `/service-requests${reqFilter!=='All' ? '?status='+reqFilter.toLowerCase() : ''}`);
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1 class="page-title">My Service Requests</h1><p class="page-sub">Track the status of your submitted requests</p></div>
+      <button class="btn btn-yellow" onclick="openNewRequestModal()"><i data-lucide="plus" width="15" height="15"></i> New Request</button> 
+    </div>
+    <div class="card">
+      <div class="tabs">${['All','Pending','Approved','Completed','Cancelled'].map(t => `<button class="tab ${reqFilter===t?'active':''}" onclick="reqFilter='${t}'; renderRequests();">${t}</button>`).join('')}</div>
+      <div style="overflow-x:auto; margin-top:10px;"><table><thead><tr><th>Request ID</th><th>Service</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>
+      ${requests.map(r => `
+        <tr><td class="cell-strong">${r.request_code}</td><td>${r.service_name}</td><td class="cell-muted">${fmtDate(r.created_at)}</td><td>
+    ${badge(r.status)}
+
+    ${
+        r.admin_comment
+        ? `
+        <div style="margin-top:6px;font-size:12px;color:#555;">
+            <strong>Admin Note:</strong><br>
+            ${r.admin_comment}
+        </div>
+        `
+        : ''
+    }
+
+</td>
+        <td><button class="btn btn-outline btn-sm" onclick='viewRequestDetail(${JSON.stringify(r).replace(/'/g,"&#39;")})'>Details</button></td></tr>
+      `).join('') || `<tr><td colspan="5" class="empty-state">No requests found.</td></tr>`}
+      </tbody></table></div>
+    </div>
+  `;
+}
+function viewRequestDetail(r) {
+  openModal(`
+    <div class="modal-head">
+      <h3>${r.request_code}</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        ${badge(r.status)}
+        <span class="cell-muted">${fmtDate(r.created_at)}</span>
+      </div>
+
+      <div class="field">
+        <label>Service</label>
+        <div class="cell-strong">${r.service_name}</div>
+      </div>
+
+      <div class="field">
+        <label>Problem Description</label>
+        <div>${r.problem_description || '—'}</div>
+      </div>
+
+      <div class="field">
+        <label>Preferred Schedule</label>
+        <div>
+          ${
+            r.block_date
+            ? `${fmtDate(r.block_date)} • ${fmtTime(r.start_time)} - ${fmtTime(r.end_time)}`
+            : 'No preference specified'
+          }
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Address</label>
+        <div>${r.address || '—'}</div>
+      </div>
+
+      ${
+        r.admin_comment
+        ? `
+        <div class="field">
+          <label>Admin Comment</label>
+
+          <div style="
+              background:#f8f9fa;
+              border-left:4px solid #198754;
+              padding:12px;
+              border-radius:6px;
+              white-space:pre-wrap;
+          ">
+              ${r.admin_comment}
+          </div>
+        </div>
+        `
+        : ''
+      }
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">Close</button>
+    </div>
+  `);
+}
+
+/* ================= APPOINTMENTS ================= */
+async function renderAppointments() {
+  const appts = await loadList(DEMO.appointments, '/appointments');
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head"><div><h1 class="page-title">Appointments</h1><p class="page-sub">Your confirmed and upcoming schedule</p></div></div>
+    <div class="card">
+      <div style="overflow-x:auto;"><table><thead><tr><th>Date &amp; Time</th><th>Service</th><th>Location</th><th>Status</th></tr></thead><tbody>
+      ${appts.map(a => `
+        <tr><td>${fmtDate(a.appointment_date)}<br/><span class="cell-muted">${fmtTime(a.start_time)} - ${fmtTime(a.end_time)}</span></td>
+        <td class="cell-strong">${a.service_name||''}</td><td>${a.location||'—'}</td><td>${badge(a.status)}</td></tr>
+      `).join('') || `<tr><td colspan="4" class="empty-state">No appointments scheduled.</td></tr>`}
+      </tbody></table></div>
+    </div>
+  `;
+}
+
+/* ================= INQUIRIES ================= */
+async function renderInquiries() {
+  const inquiries = await loadList(DEMO.inquiries, '/inquiries');
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1 class="page-title">Inquiries</h1><p class="page-sub">Ask us anything about our services</p></div>
+      <button class="btn btn-yellow" onclick="openNewInquiryModal()"><i data-lucide="plus" width="15" height="15"></i> New Inquiry</button>
+    </div>
+    <div class="card">
+      ${inquiries.map(i => `
+        <div style="padding:16px 20px; border-bottom:1px solid #f0f3f1;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span class="cell-strong">${i.subject}</span>${badge(i.status)}
+          </div>
+          <div class="cell-muted" style="margin-bottom:6px;">${fmtDate(i.created_at)}</div>
+          <div style="font-size:13px; color:var(--ink); background:#f8faf8; padding:9px 12px; border-radius:9px; margin-bottom:${i.reply?'8px':'0'};">${i.message}</div>
+          ${i.reply ? `<div style="font-size:13px; background:var(--green-bg); color:var(--green-fg); padding:9px 12px; border-radius:9px;"><b>Reply:</b> ${i.reply}</div>` : ''}
+        </div>
+      `).join('') || `<div class="empty-state">No inquiries yet.</div>`}
+    </div>
+  `;
+}
+function openNewInquiryModal() {
+  openModal(`
+    <div class="modal-head"><h3>New Inquiry</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <form id="newInqForm">
+      <div class="modal-body">
+        <div class="field"><label>Subject</label><input id="ni_subject" placeholder="Enter subject..." required/></div>
+        <div class="field"><label>Message</label><textarea id="ni_message" rows="4" placeholder="Type your message..." required></textarea></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary">Send Inquiry</button></div>
+    </form>
+  `);
+  document.getElementById('newInqForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = { subject: document.getElementById('ni_subject').value, message: document.getElementById('ni_message').value };
+    if (DEMO_MODE) { toast('Inquiry sent (demo mode).'); closeModal(); return navigate('inquiries'); }
+    try { await api('/inquiries', { method:'POST', body: JSON.stringify(payload) }); toast('Inquiry sent.'); closeModal(); navigate('inquiries'); }
+    catch (err) { toast(err.message, true); }
+  });
+}
+
+/* ================= NOTIFICATIONS ================= */
+async function openNotifications() {
+  const notifs = await loadList(DEMO.notifications, '/notifications');
+  openModal(`
+    <div class="modal-head"><h3>Notifications</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body" style="padding:0;">
+      ${notifs.map(n => `
+        <div style="display:flex; gap:10px; padding:14px 20px; border-bottom:1px solid #f0f3f1; ${n.is_read?'':'background:#fbfdf5;'}">
+          <div style="width:32px;height:32px;border-radius:9px;background:var(--amber-bg);color:var(--amber-fg);display:flex;align-items:center;justify-content:center; flex-shrink:0;"><i data-lucide="bell" width="14" height="14"></i></div>
+          <div style="flex:1;"><div class="cell-strong" style="font-size:12.5px;">${n.title}</div><div class="cell-muted" style="margin:2px 0;">${n.message}</div><div class="cell-muted">${new Date(n.created_at).toLocaleString()}</div></div>
+        </div>
+      `).join('') || `<div class="empty-state">No notifications.</div>`}
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Close</button></div>
+  `);
+}
+
+/* ================= PROFILE / SETTINGS ================= */
+async function renderProfile() {
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head"><div><h1 class="page-title">Profile</h1><p class="page-sub">Your account information</p></div></div>
+    <div class="card card-pad" style="max-width:480px;">
+      <div class="field"><label>Full name</label><input id="pf_name" value="${CURRENT_USER.full_name}"/></div>
+      <div class="field"><label>Email</label><input value="${CURRENT_USER.email}" disabled/></div>
+      <div class="field"><label>Phone number</label><input id="pf_phone" value="${CURRENT_USER.phone_number||''}"/></div>
+      <div class="field"><label>Address</label><input id="pf_address" value="${CURRENT_USER.address||''}"/></div>
+      <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+    </div>
+  `;
+}
+async function saveProfile() {
+  const payload = { full_name: document.getElementById('pf_name').value, phone_number: document.getElementById('pf_phone').value, address: document.getElementById('pf_address').value };
+  if (DEMO_MODE) { Object.assign(CURRENT_USER, payload); toast('Profile updated (demo mode).'); return; }
+  try {
+    await api(`/users/${CURRENT_USER.user_id}`, { method:'PUT', body: JSON.stringify(payload) });
+    Object.assign(CURRENT_USER, payload);
+    localStorage.setItem('gupana_client_user', JSON.stringify(CURRENT_USER));
+    document.getElementById('userName').textContent = CURRENT_USER.full_name;
+    toast('Profile updated.');
+  } catch (err) { toast(err.message, true); }
+}
+async function renderSettings() {
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head"><div><h1 class="page-title">Settings</h1><p class="page-sub">Change your password</p></div></div>
+    <div class="card card-pad" style="max-width:480px;">
+      <div class="field"><label>New password</label><input id="set_password" type="password" placeholder="••••••••"/></div>
+      <button class="btn btn-primary" onclick="savePassword()">Update Password</button>
+    </div>
+  `;
+}
+async function savePassword() {
+  const password = document.getElementById('set_password').value;
+  if (!password || password.length < 6) { toast('Password must be at least 6 characters.', true); return; }
+  if (DEMO_MODE) { toast('Password updated (demo mode).'); return; }
+  try { await api(`/users/${CURRENT_USER.user_id}/password`, { method:'PUT', body: JSON.stringify({ password }) }); toast('Password updated.'); }
+  catch (err) { toast(err.message, true); }
+}
+
+/* ================= INIT ================= */
+(async function init() {
+  lucide.createIcons();
+  if (TOKEN && CURRENT_USER) { await tryConnectBackend(); enterApp(); }
+})();
+</script>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gupana Admin | Service Request &amp; Inquiry Management</title>
+<link rel="icon" href="data:,">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --green-900:#0a3622;
+  --green-800:#0d4229;
+  --green-700:#125c37;
+  --yellow:#ffd400;
+  --yellow-dark:#e6bf00;
+  --ink:#152318;
+  --muted:#6b7a70;
+  --line:#e6ece7;
+  --bg:#f4f7f5;
+  --card:#ffffff;
+  --amber-bg:#fff6da; --amber-fg:#a5690a;
+  --green-bg:#e2f7ea; --green-fg:#0f8a44;
+  --blue-bg:#e6f0ff; --blue-fg:#2064d6;
+  --red-bg:#fde7e7; --red-fg:#c0332e;
+  --purple-bg:#f1e9ff; --purple-fg:#7a3fe0;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(10,54,34,.06), 0 8px 24px -12px rgba(10,54,34,.12);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:#cfd9d2;border-radius:8px;}
+
+/* ---------- Login screen ---------- */
+#loginScreen{
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(circle at 20% 20%, #124a2c, var(--green-900) 60%);
+  padding:24px;
+}
+.login-card{
+  width:100%; max-width:400px; background:var(--card); border-radius:20px;
+  padding:36px 32px; box-shadow:0 30px 60px -20px rgba(0,0,0,.5);
+}
+.login-logo{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+.login-logo .mark{
+  width:44px; height:44px; border-radius:10px; background:var(--green-900);
+  display:flex; align-items:center; justify-content:center; color:var(--yellow); font-weight:800; font-size:20px;
+}
+.login-logo b{font-size:17px; letter-spacing:.3px; line-height:1.1; display:block;}
+.login-logo span{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px;}
+.login-title{font-size:22px; font-weight:800; margin:22px 0 4px;}
+.login-sub{color:var(--muted); font-size:13.5px; margin-bottom:22px;}
+.field{margin-bottom:16px;}
+.field label{display:block; font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:6px;}
+.field input, .field textarea, .field select{
+  width:100%; padding:11px 13px; border:1.5px solid var(--line); border-radius:10px;
+  font-size:14px; background:#fbfdfc; transition:border .15s;
+}
+.field input:focus, .field textarea:focus, .field select:focus{
+  outline:none; border-color:var(--green-700); background:#fff;
+}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:11px 18px; border-radius:10px; border:none; font-weight:700; font-size:13.5px;
+  transition:filter .12s, transform .05s;
+}
+.btn:active{transform:translateY(1px);}
+.btn-primary{background:var(--green-900); color:#fff; width:100%;}
+.btn-primary:hover{filter:brightness(1.15);}
+.btn-yellow{background:var(--yellow); color:var(--green-900);}
+.btn-yellow:hover{background:var(--yellow-dark);}
+.btn-outline{background:#fff; border:1.5px solid var(--line); color:var(--ink);}
+.btn-outline:hover{border-color:var(--green-700);}
+.btn-sm{padding:7px 12px; font-size:12.5px; border-radius:8px;}
+.btn-danger-outline{background:#fff;border:1.5px solid var(--red-fg);color:var(--red-fg);}
+.login-demo{
+  margin-top:18px; padding:12px 14px; background:#f6faf7; border:1px dashed var(--line);
+  border-radius:10px; font-size:12px; color:var(--muted); line-height:1.6;
+}
+.login-error{
+  background:var(--red-bg); color:var(--red-fg); font-size:12.5px; padding:9px 12px;
+  border-radius:8px; margin-bottom:14px; display:none;
+}
+
+/* ---------- App shell ---------- */
+#app{display:none; min-height:100vh;}
+.topbar{
+  position:sticky; top:0; z-index:40; height:64px; background:var(--green-900);
+  display:flex; align-items:center; gap:14px; padding:0 18px; color:#fff;
+}
+.hamburger{
+  display:none; background:transparent; border:none; color:#fff; padding:6px;
+  border-radius:8px;
+}
+.hamburger:hover{background:rgba(255,255,255,.1);}
+.topbar-logo{display:flex; align-items:center; gap:10px;}
+.topbar-logo .mark{
+  width:34px; height:34px; border-radius:9px; background:var(--yellow);
+  color:var(--green-900); font-weight:800; display:flex; align-items:center; justify-content:center; font-size:16px;
+}
+.topbar-logo b{color:var(--yellow); font-size:14.5px; letter-spacing:.3px; display:block; line-height:1.15;}
+.topbar-logo span{font-size:9.5px; color:#cfe9da; letter-spacing:.8px; text-transform:uppercase;}
+.topbar-spacer{flex:1;}
+.icon-btn{
+  position:relative; width:38px; height:38px; border-radius:10px; border:none;
+  background:rgba(255,255,255,.08); color:#fff; display:flex; align-items:center; justify-content:center;
+}
+.icon-btn:hover{background:rgba(255,255,255,.18);}
+.icon-badge{
+  position:absolute; top:-4px; right:-4px; background:var(--red-fg); color:#fff; font-size:10px;
+  font-weight:800; min-width:17px; height:17px; border-radius:9px; display:flex; align-items:center; justify-content:center; padding:0 4px;
+  border:2px solid var(--green-900);
+}
+.user-chip{
+  display:flex; align-items:center; gap:9px; padding:6px 10px 6px 6px; border-radius:12px; background:rgba(255,255,255,.06);
+  border:none; color:#fff;
+}
+.user-chip:hover{background:rgba(255,255,255,.14);}
+.user-avatar{
+  width:30px; height:30px; border-radius:50%; background:var(--yellow); color:var(--green-900);
+  display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12.5px;
+}
+.user-chip .u-name{font-size:12.5px; font-weight:700; line-height:1.2;}
+.user-chip .u-role{font-size:10.5px; color:#bcd8c8; text-transform:capitalize;}
+
+.shell{display:flex;}
+.sidebar{
+  width:230px; flex-shrink:0; background:#fff; border-right:1px solid var(--line);
+  min-height:calc(100vh - 64px); padding:16px 12px; position:sticky; top:64px; align-self:flex-start;
+  height:calc(100vh - 64px); overflow-y:auto;
+}
+.nav-group-label{font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:#9caea2; font-weight:800; margin:16px 10px 6px;}
+.nav-item{
+  display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:10px; color:#3d4a41;
+  font-size:13.5px; font-weight:600; margin-bottom:2px; border:none; background:transparent; width:100%; text-align:left;
+}
+.nav-item svg{width:17px; height:17px; flex-shrink:0;}
+.nav-item:hover{background:#f0f5f1;}
+.nav-item.active{background:var(--green-900); color:#fff;}
+.nav-item .badge-dot{
+  margin-left:auto; background:var(--red-fg); color:#fff; font-size:10px; font-weight:800;
+  min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 4px;
+}
+
+.main{flex:1; padding:22px 24px 90px; min-width:0;}
+.page-head{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px;}
+.page-title{font-size:22px; font-weight:800; margin:0;}
+.page-sub{color:var(--muted); font-size:13px; margin:2px 0 0;}
+
+.grid{display:grid; gap:16px;}
+.grid-5{grid-template-columns:repeat(5,1fr);}
+.grid-2{grid-template-columns:2fr 1fr;}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+@media (max-width:1200px){.grid-5{grid-template-columns:repeat(3,1fr);} .grid-2{grid-template-columns:1fr;}}
+@media (max-width:640px){.grid-5{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:1fr;}}
+
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);}
+.card-pad{padding:18px 20px;}
+.card-head{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--line);}
+.card-head h3{margin:0; font-size:14.5px; font-weight:800;}
+.link-sm{font-size:12px; font-weight:700; color:var(--green-700);}
+
+.stat{padding:18px; display:flex; flex-direction:column; gap:10px;}
+.stat-icon{width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center;}
+.stat-icon svg{width:19px;height:19px;}
+.stat-val{font-size:24px; font-weight:800; line-height:1;}
+.stat-label{font-size:12px; color:var(--muted); font-weight:600;}
+.stat-link{font-size:11.5px; font-weight:700; color:var(--green-700); margin-top:-2px;}
+.c-green .stat-icon{background:var(--green-bg); color:var(--green-fg);}
+.c-amber .stat-icon{background:var(--amber-bg); color:var(--amber-fg);}
+.c-blue .stat-icon{background:var(--blue-bg); color:var(--blue-fg);}
+.c-purple .stat-icon{background:var(--purple-bg); color:var(--purple-fg);}
+.c-red .stat-icon{background:var(--red-bg); color:var(--red-fg);}
+
+table{width:100%; border-collapse:collapse; font-size:13px;}
+th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:#8a988e; padding:10px 20px; border-bottom:1px solid var(--line); white-space:nowrap;}
+td{padding:12px 20px; border-bottom:1px solid #f0f3f1; vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:#fafcfa;}
+.cell-strong{font-weight:700;}
+.cell-muted{color:var(--muted); font-size:12px;}
+
+.badge{display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; text-transform:capitalize;}
+.badge-pending{background:var(--amber-bg); color:var(--amber-fg);}
+.badge-approved,.badge-confirmed,.badge-completed,.badge-answered,.badge-active{background:var(--green-bg); color:var(--green-fg);}
+.badge-cancelled,.badge-unanswered,.badge-suspended{background:var(--red-bg); color:var(--red-fg);}
+.badge-inactive{background:#eef1ef;color:var(--muted);}
+
+.tabs{display:flex; gap:6px; flex-wrap:wrap; padding:14px 20px 0;}
+.tab{padding:7px 14px; border-radius:9px; font-size:12.5px; font-weight:700; border:1.5px solid var(--line); background:#fff; color:var(--muted);}
+.tab.active{background:var(--green-900); color:#fff; border-color:var(--green-900);}
+.toolbar{display:flex; align-items:center; gap:10px; padding:14px 20px; flex-wrap:wrap;}
+.search-box{flex:1; min-width:180px; display:flex; align-items:center; gap:8px; border:1.5px solid var(--line); border-radius:9px; padding:8px 12px; background:#fbfdfc;}
+.search-box input{border:none; background:transparent; outline:none; font-size:13px; width:100%;}
+.search-box svg{width:15px;height:15px;color:#9caea2;}
+
+.icon-action{width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:#fff; display:inline-flex; align-items:center; justify-content:center; margin-left:4px;}
+.icon-action:hover{background:#f2f6f3;}
+.icon-action svg{width:14px;height:14px;}
+
+.empty-state{padding:50px 20px; text-align:center; color:var(--muted);}
+.empty-state svg{width:34px;height:34px; margin-bottom:10px; color:#c3cec6;}
+
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(10,20,14,.5); display:none; align-items:center; justify-content:center;
+  z-index:100; padding:20px;
+}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff; border-radius:16px; width:100%; max-width:460px; max-height:88vh; overflow-y:auto; box-shadow:0 30px 70px -20px rgba(0,0,0,.5);}
+.modal-head{display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--line);}
+.modal-head h3{margin:0; font-size:15.5px; font-weight:800;}
+.modal-close{width:30px; height:30px; border-radius:8px; border:none; background:#f2f6f3; display:flex; align-items:center; justify-content:center;}
+.modal-body{padding:18px 20px;}
+.modal-foot{display:flex; gap:10px; padding:16px 20px; border-top:1px solid var(--line);}
+.modal-foot .btn{flex:1;}
+
+.toast-wrap{position:fixed; bottom:22px; right:22px; z-index:200; display:flex; flex-direction:column; gap:10px;}
+.toast{background:var(--green-900); color:#fff; padding:12px 16px; border-radius:10px; font-size:13px; font-weight:600;
+  box-shadow:0 15px 30px -10px rgba(0,0,0,.4); display:flex; align-items:center; gap:8px; min-width:220px; animation:slideIn .25s ease;}
+.toast.error{background:var(--red-fg);}
+@keyframes slideIn{from{transform:translateX(30px); opacity:0;} to{transform:translateX(0); opacity:1;}}
+
+.demo-banner{
+  background:var(--yellow); color:var(--green-900); font-size:12px; font-weight:700; text-align:center;
+  padding:7px; display:none;
+}
+
+.drawer-overlay{position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:60; display:none;}
+.drawer-overlay.open{display:block;}
+
+.bottom-nav{
+  display:none; position:fixed; bottom:0; left:0; right:0; z-index:50; background:#fff;
+  border-top:1px solid var(--line); padding:8px 4px 10px; gap:2px;
+}
+.bottom-nav-item{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10px; font-weight:700;
+  color:#8a988e; border:none; background:transparent; padding:4px;
+}
+.bottom-nav-item svg{width:19px;height:19px;}
+.bottom-nav-item.active{color:var(--green-900);}
+
+.services-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:12px; padding:18px 20px;}
+.service-tile{border:1px solid var(--line); border-radius:12px; padding:16px; text-align:left; background:#fff;}
+.service-tile .s-icon{width:36px;height:36px;border-radius:10px;background:var(--green-bg);color:var(--green-fg);display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.service-tile .s-icon svg{width:18px;height:18px;}
+.service-tile h4{margin:0 0 4px; font-size:13.5px;}
+.service-tile p{margin:0; font-size:11.5px; color:var(--muted); line-height:1.5;}
+
+@media (max-width:900px){
+  .sidebar{position:fixed; left:-260px; top:0; height:100vh; z-index:70; transition:left .2s; padding-top:76px; width:250px;}
+  .sidebar.open{left:0; box-shadow:20px 0 40px rgba(0,0,0,.2);}
+  .hamburger{display:flex; align-items:center; justify-content:center;}
+  .main{padding:16px 14px 90px;}
+  .bottom-nav{display:flex;}
+  .topbar-logo b{font-size:13px;}
+  .topbar-logo span{display:none;}
+  .user-chip .u-name, .user-chip .u-role{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="demo-banner" id="demoBanner">Demo mode — no backend connected. Showing sample data. Set API_BASE_URL in the script to connect your server.</div>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="mark">G</div>
+      <div>
+        <b>GUPANA ELECTRICAL SUPPLIES</b>
+        <span>Installation Services</span>
+      </div>
+    </div>
+    <div class="login-title">Administrator Login</div>
+    <div class="login-sub">Sign in to manage requests, appointments, and inquiries.</div>
+    <div class="login-error" id="loginError"></div>
+    <form id="loginForm">
+      <div class="field">
+        <label>Email address</label>
+        <input type="email" id="loginEmail" placeholder="admin@gupana.com" required />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Sign In</button>
+    </form>
+    <div class="login-demo">
+      <b>Demo credentials:</b> admin@gupana.com / Admin@123<br/>
+      If no backend is running at the configured API URL, the dashboard opens automatically with sample data so you can preview the interface.
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app">
+  <div class="topbar">
+    <button class="hamburger" id="hamburgerBtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <div class="topbar-logo">
+      <div class="mark">G</div>
+      <div>
+        <b>GUPANA ELECTRICAL SUPPLIES</b>
+        <span>and Installation Services</span>
+      </div>
+    </div>
+    <div class="topbar-spacer"></div>
+    <button class="icon-btn" id="notifBtn" title="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="icon-badge" id="notifBadge" style="display:none;">0</span>
+    </button>
+    <button class="user-chip" id="userMenuBtn">
+      <div class="user-avatar" id="userAvatar">A</div>
+      <div style="text-align:left;">
+        <div class="u-name" id="userName">Administrator</div>
+        <div class="u-role" id="userRole">admin</div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+  </div>
+
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <div class="shell">
+    <div class="sidebar" id="sidebar">
+      <button class="nav-item active" data-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</button>
+      <button class="nav-item" data-view="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Users</button>
+      <button class="nav-item" data-view="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Services</button>
+      <button class="nav-item" data-view="requests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Service Requests</button>
+      <button class="nav-item" data-view="appointments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Appointments</button>
+      <button class="nav-item" data-view="inquiries"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Inquiries</button>
+      <button class="nav-item" data-view="notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Notifications</button>
+      <div class="nav-group-label">Insights</div>
+      <button class="nav-item" data-view="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>Reports</button>
+      <button class="nav-item" data-view="activity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Activity Logs</button>
+      <div class="nav-group-label">Account</div>
+      <button class="nav-item" data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+      <button class="nav-item" id="logoutBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+    </div>
+
+    <div class="main" id="mainContent"></div>
+  </div>
+
+  <div class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item active" data-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Dashboard</button>
+    <button class="bottom-nav-item" data-view="requests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Requests</button>
+    <button class="bottom-nav-item" data-view="inquiries"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Inquiries</button>
+    <button class="bottom-nav-item" data-view="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>More</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const API_BASE_URL = "http://localhost:4000/api"; // change this to your deployed backend URL
+let DEMO_MODE = false;
+let TOKEN = localStorage.getItem('gupana_admin_token') || null;
+let CURRENT_USER = JSON.parse(localStorage.getItem('gupana_admin_user') || 'null');
+let CURRENT_VIEW = 'dashboard';
+
+/* ================= DEMO DATA (used automatically if the backend isn't reachable) ================= */
+const DEMO = {
+  user: { user_id: 1, role: 'admin', full_name: 'Administrator', email: 'admin@gupana.com' },
+  stats: { total_requests: 23, pending_requests: 12, confirmed_appointments: 15, new_inquiries: 7, unread_notifications: 18 },
+  statusBreakdown: [
+    { status: 'pending', count: 12 }, { status: 'approved', count: 8 },
+    { status: 'completed', count: 6 }, { status: 'cancelled', count: 4 },
+  ],
+  requestsOverTime: [
+    { day: 'May 9', count: 3 }, { day: 'May 10', count: 5 }, { day: 'May 11', count: 2 },
+    { day: 'May 12', count: 9 }, { day: 'May 13', count: 4 }, { day: 'May 14', count: 12 }, { day: 'May 15', count: 8 },
+  ],
+  services: [
+    { service_id: 1, service_name: 'Electrical Installation', category: 'Installation', description: 'We provide safe and reliable installation services.', icon: 'home', base_price: 2500, is_active: true },
+    { service_id: 2, service_name: 'Electrical Repair', category: 'Repair', description: 'We fix electrical issues in your home or business.', icon: 'wrench', base_price: 1200, is_active: true },
+    { service_id: 3, service_name: 'Wiring Services', category: 'Wiring', description: 'House wiring, rewiring, and new wiring setup.', icon: 'plug', base_price: 3000, is_active: true },
+    { service_id: 4, service_name: 'Maintenance', category: 'Maintenance', description: 'Preventive maintenance for your electrical systems.', icon: 'settings', base_price: 1500, is_active: true },
+  ],
+  users: [
+    { user_id: 2, role: 'client', full_name: 'Juan Dela Cruz', email: 'juan.delacruz@example.com', phone_number: '0917-111-2222', status: 'active', created_at: '2025-04-02' },
+    { user_id: 3, role: 'client', full_name: 'Maria Santos', email: 'maria.santos@example.com', phone_number: '0917-222-3333', status: 'active', created_at: '2025-04-10' },
+    { user_id: 4, role: 'client', full_name: 'Pedro Lopez', email: 'pedro.lopez@example.com', phone_number: '0917-333-4444', status: 'active', created_at: '2025-04-18' },
+    { user_id: 5, role: 'client', full_name: 'Ana Reyes', email: 'ana.reyes@example.com', phone_number: '0917-444-5555', status: 'active', created_at: '2025-05-01' },
+    { user_id: 6, role: 'client', full_name: 'Robert Garcia', email: 'robert.garcia@example.com', phone_number: '0917-555-6666', status: 'inactive', created_at: '2025-05-05' },
+  ],
+  requests: [
+    { request_id: 10, request_code: 'SR-2025-0010', client_name: 'Juan Dela Cruz', service_name: 'Electrical Installation', status: 'pending', created_at: '2025-05-15', block_date:'2025-05-15', start_time:'08:00', end_time:'10:00', address:'Purok 1, Poblacion, Borobo', problem_description:'Need new outlets installed in the kitchen and living room.' },
+    { request_id: 9, request_code: 'SR-2025-0009', client_name: 'Maria Santos', service_name: 'Wiring Repair', status: 'pending', created_at: '2025-05-15', block_date:'2025-05-16', start_time:'10:30', end_time:'12:30', address:'Purok 3, Borobo', problem_description:'Flickering lights in the second floor.' },
+    { request_id: 8, request_code: 'SR-2025-0008', client_name: 'Pedro Lopez', service_name: 'Electrical Repair', status: 'approved', created_at: '2025-05-14', block_date:'2025-05-15', start_time:'13:00', end_time:'15:00', address:'Purok 2, Borobo', problem_description:'Circuit breaker keeps tripping.' },
+    { request_id: 7, request_code: 'SR-2025-0007', client_name: 'Ana Reyes', service_name: 'Maintenance', status: 'pending', created_at: '2025-05-14', block_date:'2025-05-16', start_time:'08:00', end_time:'10:00', address:'Purok 1, Borobo', problem_description:'Yearly preventive maintenance check-up.' },
+    { request_id: 6, request_code: 'SR-2025-0006', client_name: 'Robert Garcia', service_name: 'Wiring Services', status: 'completed', created_at: '2025-05-13', block_date:'2025-05-16', start_time:'14:00', end_time:'16:00', address:'Purok 4, Borobo', problem_description:'New wiring for garage extension.' },
+  ],
+  appointments: [
+    { appointment_id: 1, client_name: 'Juan Dela Cruz', service_name: 'Electrical Installation', appointment_date: '2025-05-15', start_time: '08:00', end_time: '10:00', status: 'confirmed', location:'Purok 1, Poblacion, Borobo' },
+    { appointment_id: 2, client_name: 'Maria Santos', service_name: 'Wiring Repair', appointment_date: '2025-05-15', start_time: '10:30', end_time: '12:30', status: 'confirmed', location:'Purok 3, Borobo' },
+    { appointment_id: 3, client_name: 'Pedro Lopez', service_name: 'Electrical Repair', appointment_date: '2025-05-15', start_time: '13:00', end_time: '15:00', status: 'pending', location:'Purok 2, Borobo' },
+    { appointment_id: 4, client_name: 'Ana Reyes', service_name: 'Maintenance', appointment_date: '2025-05-16', start_time: '08:00', end_time: '10:00', status: 'confirmed', location:'Purok 1, Borobo' },
+    { appointment_id: 5, client_name: 'Robert Garcia', service_name: 'Wiring Services', appointment_date: '2025-05-16', start_time: '14:00', end_time: '16:00', status: 'confirmed', location:'Purok 4, Borobo' },
+  ],
+  inquiries: [
+    { inquiry_id: 11, inquiry_code:'INQ-2025-0011', client_name: 'Juan Dela Cruz', subject: 'Service Availability', message: 'Do you offer weekend appointments for installation services?', status: 'unanswered', created_at: '2025-05-15', reply:null },
+    { inquiry_id: 10, inquiry_code:'INQ-2025-0010', client_name: 'Maria Santos', subject: 'Price Inquiry', message: 'How much does a full house rewiring cost?', status: 'unanswered', created_at: '2025-05-15', reply:null },
+    { inquiry_id: 9, inquiry_code:'INQ-2025-0009', client_name: 'Pedro Lopez', subject: 'Schedule Inquiry', message: 'Can I move my appointment to next week?', status: 'answered', created_at: '2025-05-14', reply:'Yes, please let us know your preferred schedule block and we will confirm.' },
+    { inquiry_id: 8, inquiry_code:'INQ-2025-0008', client_name: 'Ana Reyes', subject: 'Installation Details', message: 'What brands of circuit breakers do you install?', status: 'answered', created_at: '2025-05-14', reply:'We install Schneider and ABB breakers as standard, with other brands available on request.' },
+    { inquiry_id: 7, inquiry_code:'INQ-2025-0007', client_name: 'Robert Garcia', subject: 'Warranty Inquiry', message: 'Is there a warranty on wiring services?', status: 'answered', created_at: '2025-05-13', reply:'Yes, all wiring work comes with a 6-month workmanship warranty.' },
+  ],
+  notifications: [
+    { notification_id: 1, title:'New Service Request', message:'Juan Dela Cruz submitted a new service request (SR-2025-0010).', type:'request', is_read:false, created_at:'2025-05-15T08:00:00' },
+    { notification_id: 2, title:'New Inquiry', message:'Maria Santos sent an inquiry: "Price Inquiry".', type:'inquiry', is_read:false, created_at:'2025-05-15T07:40:00' },
+    { notification_id: 3, title:'Appointment Reminder', message:'Appointment with Pedro Lopez is scheduled today at 1:00 PM.', type:'appointment', is_read:true, created_at:'2025-05-15T06:00:00' },
+  ],
+  activity: [
+    { log_id: 1, user_name:'Administrator', action:'Set request SR-2025-0008 to approved', module:'Service Requests', created_at:'2025-05-14T10:22:00' },
+    { log_id: 2, user_name:'Administrator', action:'Answered inquiry INQ-2025-0009', module:'Inquiries', created_at:'2025-05-14T09:50:00' },
+    { log_id: 3, user_name:'Administrator', action:'Scheduled appointment for request SR-2025-0006', module:'Appointments', created_at:'2025-05-13T15:10:00' },
+    { log_id: 4, user_name:'Administrator', action:'Logged in', module:'Auth', created_at:'2025-05-15T07:00:00' },
+  ],
+};
+
+/* ================= API HELPER ================= */
+async function api(path, opts = {}) {
+  if (DEMO_MODE) throw new Error('DEMO_MODE');
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (TOKEN) headers['Authorization'] = `Bearer ${TOKEN}`;
+  const res = await fetch(`${API_BASE_URL}${path}`, { ...opts, headers });
+  let data = null;
+  try { data = await res.json(); } catch (e) {}
+  if (!res.ok) throw new Error((data && data.error) || 'Request failed');
+  return data;
+}
+
+async function tryConnectBackend() {
+  try {
+    const r = await fetch(`${API_BASE_URL}/health`, { method: 'GET' });
+    if (!r.ok) throw new Error('unreachable');
+    DEMO_MODE = false;
+  } catch (e) {
+    DEMO_MODE = true;
+    document.getElementById('demoBanner').style.display = 'block';
+  }
+}
+
+/* ================= TOAST ================= */
+function toast(msg, isError = false) {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast' + (isError ? ' error' : '');
+  el.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="${isError ? 'M12 8v4M12 16h.01M12 2a10 10 0 100 20 10 10 0 000-20z' : 'M20 6L9 17l-5-5'}"/></svg><span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+/* ================= AUTH ================= */
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errBox = document.getElementById('loginError');
+  errBox.style.display = 'none';
+
+  await tryConnectBackend();
+
+  if (DEMO_MODE) {
+    if (email && password) {
+      CURRENT_USER = DEMO.user;
+      TOKEN = 'demo-token';
+      localStorage.setItem('gupana_admin_token', TOKEN);
+      localStorage.setItem('gupana_admin_user', JSON.stringify(CURRENT_USER));
+      enterApp();
+    } else {
+      errBox.textContent = 'Enter an email and password to preview the demo.';
+      errBox.style.display = 'block';
+    }
+    return;
+  }
+
+  try {
+    const data = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+    if (data.user.role !== 'admin') {
+      errBox.textContent = 'This login is for administrators only.';
+      errBox.style.display = 'block';
+      return;
+    }
+    TOKEN = data.token;
+    CURRENT_USER = data.user;
+    localStorage.setItem('gupana_admin_token', TOKEN);
+    localStorage.setItem('gupana_admin_user', JSON.stringify(CURRENT_USER));
+    enterApp();
+  } catch (err) {
+    errBox.textContent = err.message || 'Invalid email or password.';
+    errBox.style.display = 'block';
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  TOKEN = null; CURRENT_USER = null;
+  localStorage.removeItem('gupana_admin_token');
+  localStorage.removeItem('gupana_admin_user');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+});
+
+function enterApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('userName').textContent = CURRENT_USER.full_name;
+  document.getElementById('userRole').textContent = CURRENT_USER.role;
+  document.getElementById('userAvatar').textContent = CURRENT_USER.full_name.charAt(0).toUpperCase();
+  lucide.createIcons();
+  navigate('dashboard');
+}
+
+/* ================= NAVIGATION ================= */
+document.querySelectorAll('.nav-item[data-view], .bottom-nav-item[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const view = btn.dataset.view;
+    if (view === 'more') { openMoreMenu(); return; }
+    navigate(view);
+    closeSidebar();
+  });
+});
+
+document.getElementById('hamburgerBtn').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+});
+document.getElementById('drawerOverlay').addEventListener('click', closeSidebar);
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+
+function openMoreMenu() {
+  openModal(`
+    <div class="modal-head"><h3>More</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body" style="display:flex; flex-direction:column; gap:6px;">
+      ${['appointments','services','reports','activity','settings'].map(v => `
+        <button class="nav-item" style="justify-content:flex-start;" onclick="navigate('${v}'); closeModal();">${v.charAt(0).toUpperCase()+v.slice(1)}</button>
+      `).join('')}
+    </div>
+  `);
+}
+
+function setActiveNav(view) {
+  document.querySelectorAll('.nav-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  document.querySelectorAll('.bottom-nav-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view || (view!=='dashboard'&&view!=='requests'&&view!=='inquiries'&&b.dataset.view==='more')));
+}
+
+async function navigate(view) {
+  CURRENT_VIEW = view;
+  setActiveNav(view);
+  const main = document.getElementById('mainContent');
+  main.innerHTML = '<div class="empty-state">Loading…</div>';
+  try {
+    switch (view) {
+      case 'dashboard': await renderDashboard(); break;
+      case 'users': await renderUsers(); break;
+      case 'services': await renderServices(); break;
+      case 'requests': await renderRequests(); break;
+      case 'appointments': await renderAppointments(); break;
+      case 'inquiries': await renderInquiries(); break;
+      case 'notifications': await renderNotifications(); break;
+      case 'reports': await renderReports(); break;
+      case 'activity': await renderActivity(); break;
+      case 'settings': await renderSettings(); break;
+      default: main.innerHTML = '<div class="empty-state">Not found</div>';
+    }
+  } catch (err) {
+    main.innerHTML = `<div class="empty-state">Something went wrong: ${err.message}</div>`;
+  }
+  lucide.createIcons();
+  refreshNotifBadge();
+}
+
+document.getElementById('notifBtn').addEventListener('click', () => navigate('notifications'));
+document.getElementById('userMenuBtn').addEventListener('click', () => navigate('settings'));
+
+async function refreshNotifBadge() {
+  let count = 0;
+  try {
+    if (DEMO_MODE) count = DEMO.notifications.filter(n => !n.is_read).length;
+    else count = (await api('/notifications/unread-count')).count;
+  } catch (e) {}
+  const badge = document.getElementById('notifBadge');
+  if (count > 0) { badge.style.display = 'flex'; badge.textContent = count > 9 ? '9+' : count; }
+  else badge.style.display = 'none';
+}
+
+/* ================= MODAL ================= */
+function openModal(html) {
+  document.getElementById('modalBox').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('open');
+  lucide.createIcons();
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target.id === 'modalOverlay') closeModal(); });
+
+function fmtDate(d) { if(!d) return '—'; const dt = new Date(d); return dt.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); }
+function fmtTime(t) { if(!t) return ''; const [h,m] = t.split(':'); const hh = ((+h+11)%12)+1; return `${hh}:${m} ${+h<12?'AM':'PM'}`; }
+function badge(status) { return `<span class="badge badge-${status}">${status}</span>`; }
+
+async function loadList(demoArr, path) {
+  if (DEMO_MODE) return demoArr;
+  try { return await api(path); } catch (e) { toast(e.message, true); return []; }
+}
+
+/* ================= DASHBOARD ================= */
+let donutChartInstance = null, lineChartInstance = null;
+async function renderDashboard() {
+  let stats, statusBreakdown, requestsOverTime, recentRequests, upcomingAppointments;
+  if (DEMO_MODE) {
+    stats = DEMO.stats; statusBreakdown = DEMO.statusBreakdown; requestsOverTime = DEMO.requestsOverTime;
+    recentRequests = DEMO.requests.slice(0,5); upcomingAppointments = DEMO.appointments.slice(0,5);
+  } else {
+    try {
+      const d = await api('/reports/dashboard');
+      stats = d; statusBreakdown = d.status_breakdown; requestsOverTime = d.requests_over_time;
+      recentRequests = d.recent_requests; upcomingAppointments = d.upcoming_appointments;
+    } catch (e) { toast(e.message, true); return; }
+  }
+
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1 class="page-title">Dashboard</h1><p class="page-sub">Overview of your system</p></div>
+    </div>
+    <div class="grid grid-5" style="margin-bottom:18px;">
+      <div class="card stat c-green"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div><div class="stat-val">${stats.total_requests}</div><div class="stat-label">Total Requests</div><a class="stat-link" onclick="navigate('requests')">View all requests</a></div>
+      <div class="card stat c-amber"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-val">${stats.pending_requests}</div><div class="stat-label">Pending Requests</div><a class="stat-link" onclick="navigate('requests')">View pending</a></div>
+      <div class="card stat c-blue"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div><div class="stat-val">${stats.confirmed_appointments}</div><div class="stat-label">Confirmed Appointments</div><a class="stat-link" onclick="navigate('appointments')">View schedule</a></div>
+      <div class="card stat c-purple"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="stat-val">${stats.new_inquiries}</div><div class="stat-label">New Inquiries</div><a class="stat-link" onclick="navigate('inquiries')">View inquiries</a></div>
+      <div class="card stat c-red"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 003.4 0"/></svg></div><div class="stat-val">${stats.unread_notifications}</div><div class="stat-label">Unread Notifications</div><a class="stat-link" onclick="navigate('notifications')">View all</a></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:18px;">
+      <div class="card"><div class="card-head"><h3>Request Status Overview</h3></div><div class="card-pad" style="display:flex; align-items:center; gap:22px; flex-wrap:wrap;">
+        <canvas id="donutChart" width="150" height="150" style="max-width:150px;"></canvas>
+        <div style="flex:1; min-width:160px; display:flex; flex-direction:column; gap:10px;">
+          ${statusBreakdown.map(s => `<div style="display:flex; align-items:center; gap:8px; font-size:13px;"><span style="width:10px;height:10px;border-radius:3px;background:${statusColor(s.status)};display:inline-block;"></span><span style="text-transform:capitalize; flex:1;">${s.status}</span><b>${s.count}</b></div>`).join('')}
+        </div>
+      </div></div>
+      <div class="card"><div class="card-head"><h3>Recent Service Requests</h3><a class="link-sm" onclick="navigate('requests')">View All</a></div>
+        <div>${recentRequests.length ? recentRequests.map(r => `
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 20px; border-bottom:1px solid #f0f3f1;">
+            <div style="width:34px;height:34px;border-radius:9px;background:var(--blue-bg);color:var(--blue-fg);display:flex;align-items:center;justify-content:center; flex-shrink:0;"><i data-lucide="wrench" width="15" height="15"></i></div>
+            <div style="flex:1; min-width:0;"><div class="cell-strong" style="font-size:13px;">${r.service_name}</div><div class="cell-muted">${fmtDate(r.created_at)}</div></div>
+            ${badge(r.status)}
+          </div>`).join('') : `<div class="empty-state">No requests yet.</div>`}
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px;">
+      <div class="card-head"><h3>Requests Over Time</h3></div>
+      <div class="card-pad"><canvas id="lineChart" height="80"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>Upcoming Appointments</h3><a class="link-sm" onclick="navigate('appointments')">View All</a></div>
+      <div style="overflow-x:auto;"><table><thead><tr><th>Client</th><th>Service</th><th>Date &amp; Time</th><th>Status</th></tr></thead><tbody>
+        ${upcomingAppointments.length ? upcomingAppointments.map(a => `
+          <tr><td class="cell-strong">${a.client_name}</td><td>${a.service_name||''}</td><td>${fmtDate(a.appointment_date)} • ${fmtTime(a.start_time)} - ${fmtTime(a.end_time)}</td><td>${badge(a.status)}</td></tr>
+        `).join('') : `<tr><td colspan="4" class="empty-state">No upcoming appointments.</td></tr>`}
+      </tbody></table></div>
+    </div>
+  `;
+
+  const donutCtx = document.getElementById('donutChart');
+  if (donutChartInstance) donutChartInstance.destroy();
+  donutChartInstance = new Chart(donutCtx, {
+    type: 'doughnut',
+    data: { labels: statusBreakdown.map(s=>s.status), datasets: [{ data: statusBreakdown.map(s=>s.count), backgroundColor: statusBreakdown.map(s=>statusColor(s.status)), borderWidth:0 }] },
+    options: { cutout: '68%', plugins: { legend: { display:false } } }
+  });
+
+  const lineCtx = document.getElementById('lineChart');
+  if (lineChartInstance) lineChartInstance.destroy();
+  lineChartInstance = new Chart(lineCtx, {
+    type: 'line',
+    data: { labels: requestsOverTime.map(d=>d.day||d.date||d.count), datasets: [{ data: requestsOverTime.map(d=>d.count), borderColor:'#0d4229', backgroundColor:'rgba(13,66,41,.08)', fill:true, tension:.4, pointRadius:3, pointBackgroundColor:'#0d4229' }] },
+    options: { plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, grid:{color:'#f0f3f1'}}, x:{grid:{display:false}} } }
+  });
+}
+function statusColor(status) {
+  return { pending:'#f5b301', approved:'#3b82f6', confirmed:'#3b82f6', completed:'#22c55e', cancelled:'#ef4444', unanswered:'#ef4444', answered:'#22c55e' }[status] || '#94a3b8';
+}
+
+/* ================= USERS ================= */
+async function renderUsers() {
+  const users = await loadList(DEMO.users, '/users?role=client');
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1 class="page-title">Users</h1><p class="page-sub">Manage client accounts</p></div>
+      <button class="btn btn-yellow" onclick="openUserModal()"><i data-lucide="user-plus" width="15" height="15"></i> Add Client</button>
+    </div>
+    <div class="card">
+      <div class="toolbar"><div class="search-box"><i data-lucide="search"></i><input placeholder="Search users..." id="userSearch" oninput="filterTable('userTable', this.value)"/></div></div>
+      <div style="overflow-x:auto;"><table id="userTable"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th><th></th></tr></thead><tbody>
+      ${users.map(u => `
+        <tr data-search="${(u.full_name+u.email).toLowerCase()}">
+          <td class="cell-strong">${u.full_name}</td><td>${u.email}</td><td>${u.phone_number||'—'}</td><td class="cell-muted">${fmtDate(u.created_at)}</td>
+          <td>${badge(u.status)}</td>
+          <td style="white-space:nowrap;">
+            <button class="icon-action" onclick='openUserModal(${JSON.stringify(u).replace(/'/g,"&#39;")})'><i data-lucide="pencil"></i></button>
+            <button class="icon-action" onclick="deleteUser(${u.user_id})"><i data-lucide="trash-2"></i></button>
+          </td>
+        </tr>`).join('') || `<tr><td colspan="6" class="empty-state">No users found.</td></tr>`}
+      </tbody></table></div>
+    </div>
+  `;
+}
+function openUserModal(user) {
+  const editing = !!user;
+  openModal(`
+    <div class="modal-head"><h3>${editing ? 'Edit Client' : 'Add Client'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <form id="userForm">
+      <div class="modal-body">
+        <div class="field"><label>Full name</label><input id="uf_name" value="${editing?user.full_name:''}" required/></div>
+        <div class="field"><label>Email</label><input id="uf_email" type="email" value="${editing?user.email:''}" ${editing?'disabled':''} required/></div>
+        <div class="field"><label>Phone number</label><input id="uf_phone" value="${editing?(user.phone_number||''):''}"/></div>
+        ${editing ? `<div class="field"><label>Status</label><select id="uf_status"><option value="active" ${user.status==='active'?'selected':''}>Active</option><option value="inactive" ${user.status==='inactive'?'selected':''}>Inactive</option><option value="suspended" ${user.status==='suspended'?'selected':''}>Suspended</option></select></div>` :
+        `<div class="field"><label>Temporary password</label><input id="uf_password" type="text" placeholder="e.g. Client@123" required/></div>`}
+      </div>
+      <div class="modal-foot"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary">${editing?'Save Changes':'Create Client'}</button></div>
+    </form>
+  `);
+  document.getElementById('userForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = { full_name: document.getElementById('uf_name').value, phone_number: document.getElementById('uf_phone').value };
+    try {
+      if (DEMO_MODE) { toast(editing ? 'Client updated (demo mode).' : 'Client created (demo mode).'); closeModal(); return renderUsers(); }
+      if (editing) {
+        payload.status = document.getElementById('uf_status').value;
+        await api(`/users/${user.user_id}`, { method:'PUT', body: JSON.stringify(payload) });
+        toast('Client updated.');
+      } else {
+        payload.email = document.getElementById('uf_email').value;
+        payload.password = document.getElementById('uf_password').value;
+        await api('/auth/register', { method:'POST', body: JSON.stringify(payload) });
+        toast('Client created.');
+      }
+      closeModal(); renderUsers();
+    } catch (err) { toast(err.message, true); }
+  });
+}
+async function deleteUser(id) {
+  if (!confirm('Remove this client account?')) return;
+  if (DEMO_MODE) { toast('Client removed (demo mode).'); return renderUsers(); }
+  try { await api(`/users/${id}`, { method:'DELETE' }); toast('Client removed.'); renderUsers(); }
+  catch (err) { toast(err.message, true); }
+}
+function filterTable(tableId, term) {
+  term = term.toLowerCase();
+  document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
+    tr.style.display = (tr.dataset.search||'').includes(term) ? '' : 'none';
+  });
+}
+
+/* ================= SERVICES ================= */
+async function renderServices() {
+  const services = await loadList(DEMO.services, '/services');
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1 class="page-title">Services</h1><p class="page-sub">Manage the service catalog clients can browse and request</p></div>
+      <button class="btn btn-yellow" onclick="openServiceModal()"><i data-lucide="plus" width="15" height="15"></i> Add Service</button>
+    </div>
+    <div class="card">
+      <div class="services-grid">
+        ${services.map(s => `
+          <div class="service-tile">
+            <div class="s-icon"><i data-lucide="${s.icon||'zap'}"></i></div>
+            <h4>${s.service_name}</h4>
+            <p>${s.description||''}</p>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:12px;">
+              <span class="badge ${s.is_active?'badge-active':'badge-inactive'}">${s.is_active?'Active':'Inactive'}</span>
+              <div>
+                <button class="icon-action" onclick='openServiceModal(${JSON.stringify(s).replace(/'/g,"&#39;")})'><i data-lucide="pencil"></i></button>
+                <button class="icon-action" onclick="deleteService(${s.service_id})"><i data-lucide="trash-2"></i></button>
+              </div>
+            </div>
+          </div>
+        `).join('') || `<div class="empty-state">No services yet.</div>`}
+      </div>
+    </div>
+  `;
+}
+function openServiceModal(service) {
+  const editing = !!service;
+  openModal(`
+    <div class="modal-head"><h3>${editing?'Edit Service':'Add Service'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <form id="serviceForm">
+      <div class="modal-body">
+        <div class="field"><label>Service name</label><input id="sf_name" value="${editing?service.service_name:''}" required/></div>
+        <div class="field"><label>Category</label><input id="sf_category" value="${editing?service.category:''}" placeholder="Installation, Repair, Wiring, Maintenance..." required/></div>
+        <div class="field"><label>Description</label><textarea id="sf_desc" rows="3">${editing?(service.description||''):''}</textarea></div>
+        <div class="field"><label>Base price (₱)</label><input id="sf_price" type="number" step="0.01" value="${editing?(service.base_price||''):''}"/></div>
+        <div class="field"><label>Icon (lucide name)</label><input id="sf_icon" value="${editing?(service.icon||'zap'):'zap'}" placeholder="home, wrench, plug, settings"/></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary">${editing?'Save Changes':'Add Service'}</button></div>
+    </form>
+  `);
+  document.getElementById('serviceForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+      service_name: document.getElementById('sf_name').value,
+      category: document.getElementById('sf_category').value,
+      description: document.getElementById('sf_desc').value,
+      base_price: parseFloat(document.getElementById('sf_price').value) || null,
+      icon: document.getElementById('sf_icon').value || 'zap',
+    };
+    try {
+      if (DEMO_MODE) { toast('Saved (demo mode).'); closeModal(); return renderServices(); }
+      if (editing) await api(`/services/${service.service_id}`, { method:'PUT', body: JSON.stringify(payload) });
+      else await api('/services', { method:'POST', body: JSON.stringify(payload) });
+      toast('Service saved.'); closeModal(); renderServices();
+    } catch (err) { toast(err.message, true); }
+  });
+}
+async function deleteService(id) {
+  if (!confirm('Remove this service?')) return;
+  if (DEMO_MODE) { toast('Removed (demo mode).'); return renderServices(); }
+  try { await api(`/services/${id}`, { method:'DELETE' }); toast('Service removed.'); renderServices(); }
+  catch (err) { toast(err.message, true); }
+}
+
+/* ================= SERVICE REQUESTS ================= */
+let requestsFilter = 'All';
+async function renderRequests() {
+  const requests = await loadList(DEMO.requests, `/service-requests${requestsFilter!=='All' ? '?status='+requestsFilter.toLowerCase() : ''}`);
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head"><div><h1 class="page-title">Service Requests</h1><p class="page-sub">Review and manage incoming service requests</p></div></div>
+    <div class="card">
+      <div class="tabs">${['All','Pending','Approved','Completed','Cancelled'].map(t => `<button class="tab ${requestsFilter===t?'active':''}" onclick="requestsFilter='${t}'; renderRequests();">${t}</button>`).join('')}</div>
+      <div class="toolbar"><div class="search-box"><i data-lucide="search"></i><input placeholder="Search request, client, or service..." id="reqSearch" oninput="filterTable('reqTable', this.value)"/></div></div>
+      <div style="overflow-x:auto;"><table id="reqTable"><thead><tr><th>Request ID</th><th>Client</th><th>Service</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>
+      ${requests.map(r => `
+        <tr data-search="${(r.request_code+r.client_name+r.service_name).toLowerCase()}">
+          <td class="cell-strong">${r.request_code}</td><td>${r.client_name}</td><td>${r.service_name}</td><td class="cell-muted">${fmtDate(r.created_at)}</td><td>${badge(r.status)}</td>
+          <td style="white-space:nowrap;"><button class="icon-action" onclick='viewRequest(${JSON.stringify(r).replace(/'/g,"&#39;")})'><i data-lucide="eye"></i></button></td>
+        </tr>`).join('') || `<tr><td colspan="6" class="empty-state">No service requests found.</td></tr>`}
+      </tbody></table></div>
+    </div>
+  `;
+}
+function viewRequest(r) {
+  openModal(`
+    <div class="modal-head"><h3>${r.request_code}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">${badge(r.status)}<span class="cell-muted">${fmtDate(r.created_at)}</span></div>
+      <div class="field"><label>Client</label><div class="cell-strong">${r.client_name}</div></div>
+      <div class="field"><label>Service</label><div>${r.service_name}</div></div>
+      <div class="field"><label>Problem description</label><div style="font-size:13px; color:var(--muted);">${r.problem_description||'—'}</div></div>
+      <div class="field"><label>Preferred schedule</label><div>${r.block_date ? fmtDate(r.block_date)+' • '+fmtTime(r.start_time)+' - '+fmtTime(r.end_time) : 'No preference specified'}</div></div>
+      <div class="field"><label>Address</label><div>${r.address||'—'}</div></div>
+    </div>
+    <div class="modal-foot" style="flex-wrap:wrap;">
+      ${r.status==='pending' ? `<button class="btn btn-primary" onclick="scheduleAppointment(${JSON.stringify(r).replace(/"/g,'&quot;')})">Approve &amp; Schedule</button><button class="btn btn-danger-outline" onclick="updateRequestStatus(${r.request_id},'cancelled')">Decline</button>` : ''}
+      ${r.status==='approved' ? `<button class="btn btn-primary" onclick="updateRequestStatus(${r.request_id},'completed')">Mark Completed</button>` : ''}
+      <button class="btn btn-outline" onclick="closeModal()">Close</button>
+    </div>
+  `);
+}
+async function updateRequestStatus(id, status, admin_comment = "") {
+  if (DEMO_MODE) { toast(`Request set to ${status} (demo mode).`); closeModal(); return renderRequests(); }
+  try { await api(`/service-requests/${id}/status`, { method:'PUT', body: JSON.stringify({
+    status,
+    admin_comment
+}) }); toast(`Request set to ${status}.`); closeModal(); renderRequests(); }
+  catch (err) { toast(err.message, true); }
+}
+function scheduleAppointment(r) {
+  openModal(`
+    <div class="modal-head"><h3>Approve &amp; Schedule</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <form id="apptForm">
+      <div class="modal-body">
+        <p class="cell-muted" style="margin-top:0;">Assign a confirmed appointment slot for <b>${r.client_name}</b> — ${r.service_name}</p>
+        <div class="field"><label>Date</label><input type="date" id="af_date" value="${r.block_date||''}" required/></div>
+        <div style="display:flex; gap:10px;">
+          <div class="field" style="flex:1;"><label>Start time</label><input type="time" id="af_start" value="${r.start_time||'08:00'}" required/></div>
+          <div class="field" style="flex:1;"><label>End time</label><input type="time" id="af_end" value="${r.end_time||'10:00'}" required/></div>
+        </div>
+        <div class="field"><label>Location</label><input id="af_location" value="${r.address||''}"/></div>
+        <div class="field"><label>Note for client (optional)</label><textarea id="af_note" rows="2" placeholder="Please make sure someone is available during the schedule."></textarea></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary">Confirm Appointment</button></div>
+    </form>
+  `);
+  document.getElementById('apptForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+  const adminComment = document.getElementById('af_note').value;
+
+    const payload = {
+          request_id: r.request_id,
+          appointment_date: document.getElementById('af_date').value,
+          start_time: document.getElementById('af_start').value,
+          end_time: document.getElementById('af_end').value,
+          location: document.getElementById('af_location').value,
+          note: adminComment
+    };
+    if (DEMO_MODE) { toast('Appointment confirmed (demo mode).'); closeModal(); return renderRequests(); }
+    try { await api('/appointments', { method:'POST', body: JSON.stringify(payload) });
+    await updateRequestStatus(
+    r.request_id,
+    'approved',
+    adminComment
+); toast('Appointment confirmed.'); closeModal(); renderRequests(); }
+    catch (err) { toast(err.message, true); }
+  });
+}
+
+/* ================= APPOINTMENTS ================= */
+let apptFilter = 'All';
+async function renderAppointments() {
+  const appts = await loadList(DEMO.appointments, `/appointments${apptFilter!=='All' ? '?status='+apptFilter.toLowerCase() : ''}`);
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head"><div><h1 class="page-title">Appointments</h1><p class="page-sub">Confirmed and pending appointment schedule</p></div></div>
+    <div class="card">
+      <div class="tabs">${['All','Confirmed','Pending','Completed','Cancelled'].map(t => `<button class="tab ${apptFilter===t?'active':''}" onclick="apptFilter='${t}'; renderAppointments();">${t}</button>`).join('')}</div>
+      <div class="toolbar"><div class="search-box"><i data-lucide="search"></i><input placeholder="Search appointment..." id="apptSearch" oninput="filterTable('apptTable', this.value)"/></div></div>
+      <div style="overflow-x:auto;"><table id="apptTable"><thead><tr><th>Date &amp; Time</th><th>Client</th><th>Service</th><th>Status</th><th></th></tr></thead><tbody>
+      ${appts.map(a => `
+        <tr data-search="${(a.client_name+a.service_name).toLowerCase()}">
+          <td>${fmtDate(a.appointment_date)}<br/><span class="cell-muted">${fmtTime(a.start_time)} - ${fmtTime(a.end_time)}</span></td>
+          <td class="cell-strong">${a.client_name}</td><td>${a.service_name||''}</td><td>${badge(a.status)}</td>
+          <td style="white-space:nowrap;">
+            ${a.status!=='completed'&&a.status!=='cancelled' ? `<button class="icon-action" onclick="updateApptStatus(${a.appointment_id},'completed')" title="Mark completed"><i data-lucide="check"></i></button>
+            <button class="icon-action" onclick="updateApptStatus(${a.appointment_id},'cancelled')" title="Cancel"><i data-lucide="x"></i></button>` : ''}
+          </td>
+        </tr>`).join('') || `<tr><td colspan="5" class="empty-state">No appointments found.</td></tr>`}
+      </tbody></table></div>
+    </div>
+  `;
+}
+async function updateApptStatus(id, status) {
+  if (DEMO_MODE) { toast(`Appointment set to ${status} (demo mode).`); return renderAppointments(); }
+  try { await api(`/appointments/${id}/status`, { method:'PUT', body: JSON.stringify({ status }) }); toast(`Appointment set to ${status}.`); renderAppointments(); }
+  catch (err) { toast(err.message, true); }
+}
+
+/* ================= INQUIRIES ================= */
+let inqFilter = 'All';
+async function renderInquiries() {
+  const inquiries = await loadList(DEMO.inquiries, `/inquiries${inqFilter!=='All' ? '?status='+inqFilter.toLowerCase() : ''}`);
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head"><div><h1 class="page-title">Inquiries</h1><p class="page-sub">Respond to client questions and requests for information</p></div></div>
+    <div class="card">
+      <div class="tabs">${['All','Unanswered','Answered'].map(t => `<button class="tab ${inqFilter===t?'active':''}" onclick="inqFilter='${t}'; renderInquiries();">${t}</button>`).join('')}</div>
+      <div class="toolbar"><div class="search-box"><i data-lucide="search"></i><input placeholder="Search inquiries..." id="inqSearch" oninput="filterTable('inqTable', this.value)"/></div></div>
+      <div style="overflow-x:auto;"><table id="inqTable"><thead><tr><th>Inquiry ID</th><th>Client</th><th>Subject</th><th>Status</th><th></th></tr></thead><tbody>
+      ${inquiries.map(i => `
+        <tr data-search="${(i.inquiry_code+i.client_name+i.subject).toLowerCase()}">
+          <td class="cell-strong">${i.inquiry_code}</td><td>${i.client_name}</td><td>${i.subject}</td><td>${badge(i.status)}</td>
+          <td style="white-space:nowrap;"><button class="icon-action" onclick='viewInquiry(${JSON.stringify(i).replace(/'/g,"&#39;")})'><i data-lucide="eye"></i></button></td>
+        </tr>`).join('') || `<tr><td colspan="5" class="empty-state">No inquiries found.</td></tr>`}
+      </tbody></table></div>
+    </div>
+  `;
+}
+function viewInquiry(i) {
+  openModal(`
+    <div class="modal-head"><h3>${i.inquiry_code}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">${badge(i.status)}<span class="cell-muted">${fmtDate(i.created_at)}</span></div>
+      <div class="field"><label>From</label><div class="cell-strong">${i.client_name}</div></div>
+      <div class="field"><label>Subject</label><div>${i.subject}</div></div>
+      <div class="field"><label>Message</label><div style="font-size:13px; color:var(--muted); background:#f8faf8; padding:10px 12px; border-radius:9px;">${i.message}</div></div>
+      ${i.reply ? `<div class="field"><label>Your reply</label><div style="font-size:13px; background:var(--green-bg); color:var(--green-fg); padding:10px 12px; border-radius:9px;">${i.reply}</div></div>`
+      : `<div class="field"><label>Reply</label><textarea id="replyText" rows="3" placeholder="Type your reply..."></textarea></div>`}
+    </div>
+    <div class="modal-foot">
+      ${!i.reply ? `<button class="btn btn-primary" onclick="sendReply(${i.inquiry_id})">Send Reply</button>` : ''}
+      <button class="btn btn-outline" onclick="closeModal()">Close</button>
+    </div>
+  `);
+}
+async function sendReply(id) {
+  const reply = document.getElementById('replyText').value.trim();
+  if (!reply) { toast('Write a reply before sending.', true); return; }
+  if (DEMO_MODE) { toast('Reply sent (demo mode).'); closeModal(); return renderInquiries(); }
+  try { await api(`/inquiries/${id}/reply`, { method:'PUT', body: JSON.stringify({ reply }) }); toast('Reply sent.'); closeModal(); renderInquiries(); }
+  catch (err) { toast(err.message, true); }
+}
+
+/* ================= NOTIFICATIONS ================= */
+async function renderNotifications() {
+  const notifs = await loadList(DEMO.notifications, '/notifications');
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1 class="page-title">Notifications</h1><p class="page-sub">System alerts and updates</p></div>
+      <button class="btn btn-outline" onclick="markAllRead()">Mark all as read</button>
+    </div>
+    <div class="card">
+      ${notifs.map(n => `
+        <div style="display:flex; gap:12px; padding:14px 20px; border-bottom:1px solid #f0f3f1; ${n.is_read?'':'background:#fbfdf5;'}">
+          <div style="width:34px;height:34px;border-radius:9px;background:var(--amber-bg);color:var(--amber-fg);display:flex;align-items:center;justify-content:center; flex-shrink:0;"><i data-lucide="bell" width="15" height="15"></i></div>
+          <div style="flex:1;">
+            <div class="cell-strong" style="font-size:13px;">${n.title}</div>
+            <div class="cell-muted" style="margin:2px 0 4px;">${n.message}</div>
+            <div class="cell-muted">${new Date(n.created_at).toLocaleString()}</div>
+          </div>
+          ${!n.is_read ? '<span style="width:8px;height:8px;border-radius:50%;background:var(--red-fg); margin-top:6px;"></span>' : ''}
+        </div>
+      `).join('') || `<div class="empty-state">No notifications.</div>`}
+    </div>
+  `;
+}
+async function markAllRead() {
+  if (!DEMO_MODE) { try { await api('/notifications/read-all', { method:'PUT' }); } catch(e){} }
+  else DEMO.notifications.forEach(n => n.is_read = true);
+  toast('All notifications marked as read.'); renderNotifications();
+}
+
+/* ================= REPORTS ================= */
+async function renderReports() {
+  const main = document.getElementById('mainContent');
+  const today = new Date().toISOString().slice(0,10);
+  const weekAgo = new Date(Date.now()-6*86400000).toISOString().slice(0,10);
+  main.innerHTML = `
+    <div class="page-head"><div><h1 class="page-title">Reports</h1><p class="page-sub">Generate and export operational reports</p></div></div>
+    <div class="card card-pad">
+      <div class="field"><label>Report type</label>
+        <select id="rp_type">
+          <option value="service_requests">Service Requests Report</option>
+          <option value="appointments">Appointments Report</option>
+          <option value="inquiries">Inquiries Report</option>
+          <option value="activity_logs">Activity Logs Report</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <div class="field" style="flex:1;"><label>From</label><input type="date" id="rp_from" value="${weekAgo}"/></div>
+        <div class="field" style="flex:1;"><label>To</label><input type="date" id="rp_to" value="${today}"/></div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:6px;">
+        <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+        <button class="btn btn-outline" onclick="toast('Export requires a connected backend to produce a PDF/CSV file.')">Export</button>
+      </div>
+      <div id="reportResults" style="margin-top:22px;"></div>
+    </div>
+  `;
+}
+async function generateReport() {
+  const type = document.getElementById('rp_type').value;
+  const from = document.getElementById('rp_from').value;
+  const to = document.getElementById('rp_to').value;
+  const box = document.getElementById('reportResults');
+  box.innerHTML = '<div class="empty-state">Generating…</div>';
+
+  let rows = [];
+  if (DEMO_MODE) {
+    const map = { service_requests: DEMO.requests, appointments: DEMO.appointments, inquiries: DEMO.inquiries, activity_logs: DEMO.activity };
+    rows = map[type] || [];
+  } else {
+    try { rows = (await api(`/reports/generate?type=${type}&from=${from}&to=${to}`)).rows; }
+    catch (e) { box.innerHTML = `<div class="empty-state">${e.message}</div>`; return; }
+  }
+
+  if (!rows.length) { box.innerHTML = '<div class="empty-state">No records found for this range.</div>'; return; }
+  const cols = Object.keys(rows[0]).filter(k => !k.toLowerCase().includes('_id'));
+  box.innerHTML = `<div style="overflow-x:auto;"><table><thead><tr>${cols.map(c=>`<th>${c.replace(/_/g,' ')}</th>`).join('')}</tr></thead><tbody>
+    ${rows.map(r => `<tr>${cols.map(c=>`<td>${typeof r[c]==='string'&&r[c].match(/^\d{4}-\d{2}-\d{2}/) ? fmtDate(r[c]) : (r[c]??'—')}</td>`).join('')}</tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+/* ================= ACTIVITY LOGS ================= */
+async function renderActivity() {
+  const logs = await loadList(DEMO.activity, '/activity-logs');
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head"><div><h1 class="page-title">Activity Logs</h1><p class="page-sub">Track administrative actions for accountability</p></div></div>
+    <div class="card">
+      <div style="overflow-x:auto;"><table><thead><tr><th>User</th><th>Action</th><th>Module</th><th>Date &amp; Time</th></tr></thead><tbody>
+        ${logs.map(l => `<tr><td class="cell-strong">${l.user_name||'System'}</td><td>${l.action}</td><td><span class="badge badge-active">${l.module||'—'}</span></td><td class="cell-muted">${new Date(l.created_at).toLocaleString()}</td></tr>`).join('') || `<tr><td colspan="4" class="empty-state">No activity recorded.</td></tr>`}
+      </tbody></table></div>
+    </div>
+  `;
+}
+
+/* ================= SETTINGS ================= */
+async function renderSettings() {
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `
+    <div class="page-head"><div><h1 class="page-title">Settings</h1><p class="page-sub">Your administrator account</p></div></div>
+    <div class="card card-pad" style="max-width:480px;">
+      <div class="field"><label>Full name</label><input id="st_name" value="${CURRENT_USER.full_name}"/></div>
+      <div class="field"><label>Email</label><input value="${CURRENT_USER.email}" disabled/></div>
+      <div class="field"><label>New password (leave blank to keep current)</label><input id="st_password" type="password" placeholder="••••••••"/></div>
+      <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+    </div>
+  `;
+}
+async function saveSettings() {
+  const name = document.getElementById('st_name').value;
+  const password = document.getElementById('st_password').value;
+  if (DEMO_MODE) { toast('Profile updated (demo mode).'); return; }
+  try {
+    await api(`/users/${CURRENT_USER.user_id}`, { method:'PUT', body: JSON.stringify({ full_name: name }) });
+    if (password) await api(`/users/${CURRENT_USER.user_id}/password`, { method:'PUT', body: JSON.stringify({ password }) });
+    CURRENT_USER.full_name = name;
+    localStorage.setItem('gupana_admin_user', JSON.stringify(CURRENT_USER));
+    document.getElementById('userName').textContent = name;
+    toast('Profile updated.');
+  } catch (err) { toast(err.message, true); }
+}
+
+/* ================= INIT ================= */
+(async function init() {
+  lucide.createIcons();
+  if (TOKEN && CURRENT_USER) {
+    await tryConnectBackend();
+    enterApp();
+  }
+})();
+</script>
+</body>
+</html>
