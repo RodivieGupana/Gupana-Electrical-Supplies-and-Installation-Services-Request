@@ -69,7 +69,10 @@ CREATE TABLE service_requests (
     problem_description  TEXT,
     admin_comment        TEXT,
     preferred_block_id  INTEGER REFERENCES schedule_blocks(block_id),
-    address              VARCHAR(255),
+    province VARCHAR(100),
+    municipality VARCHAR(100),
+    barangay VARCHAR(100),
+    street VARCHAR(255)
     status               VARCHAR(20) NOT NULL DEFAULT 'pending'
                           CHECK (status IN ('pending', 'approved', 'completed', 'cancelled')),
     created_at           TIMESTAMP NOT NULL DEFAULT NOW(),

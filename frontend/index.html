@@ -867,7 +867,13 @@ function viewRequest(r) {
       <div class="field"><label>Service</label><div>${r.service_name}</div></div>
       <div class="field"><label>Problem description</label><div style="font-size:13px; color:var(--muted);">${r.problem_description||'—'}</div></div>
       <div class="field"><label>Preferred schedule</label><div>${r.block_date ? fmtDate(r.block_date)+' • '+fmtTime(r.start_time)+' - '+fmtTime(r.end_time) : 'No preference specified'}</div></div>
-      <div class="field"><label>Address</label><div>${r.address||'—'}</div></div>
+      <div class="field"><label>Address</label>
+          <div>
+            ${r.street || ''},
+            Brgy. ${r.barangay || ''},
+            ${r.municipality || ''},
+            ${r.province || ''}
+          </div></div></div>
     </div>
     <div class="modal-foot" style="flex-wrap:wrap;">
       ${r.status==='pending' ? `<button class="btn btn-primary" onclick="scheduleAppointment(${JSON.stringify(r).replace(/"/g,'&quot;')})">Approve &amp; Schedule</button><button class="btn btn-danger-outline" onclick="updateRequestStatus(${r.request_id},'cancelled')">Decline</button>` : ''}
@@ -895,7 +901,13 @@ function scheduleAppointment(r) {
           <div class="field" style="flex:1;"><label>Start time</label><input type="time" id="af_start" value="${r.start_time||'08:00'}" required/></div>
           <div class="field" style="flex:1;"><label>End time</label><input type="time" id="af_end" value="${r.end_time||'10:00'}" required/></div>
         </div>
-        <div class="field"><label>Location</label><input id="af_location" value="${r.address||''}"/></div>
+        <div class="field">
+  <label>Location</label>
+  <input
+    id="af_location"
+    value="${r.street || ''}, Brgy. ${r.barangay || ''}, ${r.municipality || ''}, ${r.province || ''}"
+  />
+</div>
         <div class="field"><label>Note for client (optional)</label><textarea id="af_note" rows="2" placeholder="Please make sure someone is available during the schedule."></textarea></div>
       </div>
       <div class="modal-foot"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-primary">Confirm Appointment</button></div>

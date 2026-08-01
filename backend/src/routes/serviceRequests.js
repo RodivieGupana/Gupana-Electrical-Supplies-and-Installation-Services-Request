@@ -53,15 +53,45 @@ router.get('/:id', async (req, res) => {
 
 // POST /api/service-requests  (client submits a new request)
 router.post('/', requireRole('client'), async (req, res) => {
-  const { service_id, problem_description, preferred_block_id, address } = req.body;
+  const {
+    service_id,
+    problem_description,
+    preferred_block_id,
+    province,
+    municipality,
+    barangay,
+    street
+} = req.body;
   if (!service_id) return res.status(400).json({ error: 'service_id is required.' });
 
   const code = generateCode('SR');
   const { rows } = await pool.query(
-    `INSERT INTO service_requests (request_code, client_id, service_id, problem_description, preferred_block_id, address)
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-    [code, req.user.user_id, service_id, problem_description || null, preferred_block_id || null, address || null]
-  );
+  `INSERT INTO service_requests
+  (
+    request_code,
+    client_id,
+    service_id,
+    problem_description,
+    preferred_block_id,
+    province,
+    municipality,
+    barangay,
+    street
+  )
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+  RETURNING *`,
+  [
+    code,
+    req.user.user_id,
+    service_id,
+    problem_description || null,
+    preferred_block_id || null,
+    province || null,
+    municipality || null,
+    barangay || null,
+    street || null
+  ]
+);
 
   await notifyAllAdmins('New Service Request', `${req.user.full_name} submitted a new service request (${code}).`, 'request', rows[0].request_id);
   await logActivity(req.user.user_id, `Submitted service request ${code}`, 'Service Requests');
