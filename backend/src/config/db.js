@@ -19,3 +19,27 @@ pool.on('error', (err) => {
 });
 
 module.exports = pool;
+(async () => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        current_database() AS database,
+        current_schema() AS schema
+    `);
+
+    console.log("CONNECTED DATABASE:", result.rows[0]);
+
+    const cols = await pool.query(`
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name = 'service_requests'
+      ORDER BY ordinal_position
+    `);
+
+    console.log("SERVICE_REQUESTS COLUMNS:");
+    console.table(cols.rows);
+
+  } catch (err) {
+    console.error(err);
+  }
+})();
