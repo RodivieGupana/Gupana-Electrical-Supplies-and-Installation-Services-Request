@@ -700,7 +700,13 @@ function statusColor(status) {
 
 /* ================= USERS ================= */
 async function renderUsers() {
-  const users = await loadList(DEMO.users, '/users?role=client');
+  const keyword =
+document.getElementById('userSearch')?.value || '';
+
+const users = await loadList(
+    DEMO.users,
+    `/users?role=client&search=${encodeURIComponent(keyword)}`
+);
   const main = document.getElementById('mainContent');
   main.innerHTML = `
     <div class="page-head">
@@ -708,17 +714,47 @@ async function renderUsers() {
       <button class="btn btn-yellow" onclick="openUserModal()"><i data-lucide="user-plus" width="15" height="15"></i> Add Client</button>
     </div>
     <div class="card">
-      <div class="toolbar"><div class="search-box"><i data-lucide="search"></i><input placeholder="Search users..." id="userSearch" oninput="filterTable('userTable', this.value)"/></div></div>
-      <div style="overflow-x:auto;"><table id="userTable"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th><th></th></tr></thead><tbody>
+      <div class="toolbar"><div class="search-box"><i data-lucide="search"></i><input
+    id="userSearch"
+    placeholder="Search name, email, phone, province, municipality, barangay or street..."
+    oninput="renderUsers()"
+/></div></div>
+      <div style="overflow-x:auto;"><table id="userTable"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Joined</th><th>Status</th><th></th></tr></thead><tbody>
       ${users.map(u => `
-        <tr data-search="${(u.full_name+u.email).toLowerCase()}">
-          <td class="cell-strong">${u.full_name}</td><td>${u.email}</td><td>${u.phone_number||'—'}</td><td class="cell-muted">${fmtDate(u.created_at)}</td>
-          <td>${badge(u.status)}</td>
+        <tr data-search="${(
+    (u.full_name || '') +
+    (u.email || '') +
+    (u.phone_number || '') +
+    (u.province || '') +
+    (u.municipality || '') +
+    (u.barangay || '') +
+    (u.street || '')
+).toLowerCase()}">
+          <td>${u.email}</td>
+
+<td>${u.phone_number || '—'}</td>
+
+<td>
+    ${[
+        u.street,
+        u.barangay,
+        u.municipality,
+        u.province
+    ].filter(Boolean).join(', ')}
+</td>
+
+<td class="cell-muted">
+    ${fmtDate(u.created_at)}
+</td>
+
+<td>
+    ${badge(u.status)}
+</td>
           <td style="white-space:nowrap;">
             <button class="icon-action" onclick='openUserModal(${JSON.stringify(u).replace(/'/g,"&#39;")})'><i data-lucide="pencil"></i></button>
             <button class="icon-action" onclick="deleteUser(${u.user_id})"><i data-lucide="trash-2"></i></button>
           </td>
-        </tr>`).join('') || `<tr><td colspan="6" class="empty-state">No users found.</td></tr>`}
+        </tr>`).join('') || `<tr><td colspan="7" class="empty-state">No users found.</td></tr>`}
       </tbody></table></div>
     </div>
   `;
@@ -762,12 +798,6 @@ async function deleteUser(id) {
   if (DEMO_MODE) { toast('Client removed (demo mode).'); return renderUsers(); }
   try { await api(`/users/${id}`, { method:'DELETE' }); toast('Client removed.'); renderUsers(); }
   catch (err) { toast(err.message, true); }
-}
-function filterTable(tableId, term) {
-  term = term.toLowerCase();
-  document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
-    tr.style.display = (tr.dataset.search||'').includes(term) ? '' : 'none';
-  });
 }
 
 /* ================= SERVICES ================= */

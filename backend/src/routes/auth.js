@@ -18,7 +18,16 @@ function signToken(user) {
 // POST /api/auth/register  (clients self-register)
 router.post('/register', async (req, res) => {
   try {
-    const { full_name, email, password, phone_number, address } = req.body;
+    const {
+  full_name,
+  email,
+  password,
+  phone_number,
+  province,
+  municipality,
+  barangay,
+  street
+} = req.body;
     if (!full_name || !email || !password) {
       return res.status(400).json({ error: 'full_name, email and password are required.' });
     }
@@ -30,10 +39,49 @@ router.post('/register', async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
     const { rows } = await pool.query(
-      `INSERT INTO users (role, full_name, email, password_hash, phone_number, address)
-       VALUES ('client', $1, $2, $3, $4, $5)
-       RETURNING user_id, role, full_name, email, phone_number, address, created_at`,
-      [full_name, email, hash, phone_number || null, address || null]
+      `INSERT INTO users (
+  role,
+  full_name,
+  email,
+  password_hash,
+  phone_number,
+  province,
+  municipality,
+  barangay,
+  street
+)
+VALUES (
+  'client',
+  $1,
+  $2,
+  $3,
+  $4,
+  $5,
+  $6,
+  $7,
+  $8
+)
+RETURNING
+  user_id,
+  role,
+  full_name,
+  email,
+  phone_number,
+  province,
+  municipality,
+  barangay,
+  street,
+  created_at`,
+      [[
+  full_name,
+  email,
+  hash,
+  phone_number || null,
+  province || null,
+  municipality || null,
+  barangay || null,
+  street || null
+]]
     );
 
     const user = rows[0];
@@ -81,8 +129,21 @@ router.post('/login', async (req, res) => {
 // GET /api/auth/me
 router.get('/me', authenticate, async (req, res) => {
   const { rows } = await pool.query(
-    `SELECT user_id, role, full_name, email, phone_number, address, avatar_url, status, created_at
-     FROM users WHERE user_id = $1`,
+    `SELECT
+    user_id,
+    role,
+    full_name,
+    email,
+    phone_number,
+    province,
+    municipality,
+    barangay,
+    street,
+    avatar_url,
+    status,
+    created_at
+FROM users
+WHERE user_id = $1`,
     [req.user.user_id]
   );
   if (!rows[0]) return res.status(404).json({ error: 'User not found.' });

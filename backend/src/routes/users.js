@@ -18,9 +18,20 @@ router.get('/', requireRole('admin'), async (req, res) => {
     conditions.push(`role = $${params.length}`);
   }
   if (search) {
-    params.push(`%${search}%`);
-    conditions.push(`(full_name ILIKE $${params.length} OR email ILIKE $${params.length})`);
-  }
+  params.push(`%${search}%`);
+
+  conditions.push(`
+    (
+      full_name ILIKE $${params.length}
+      OR email ILIKE $${params.length}
+      OR phone_number ILIKE $${params.length}
+      OR province ILIKE $${params.length}
+      OR municipality ILIKE $${params.length}
+      OR barangay ILIKE $${params.length}
+      OR street ILIKE $${params.length}
+    )
+  `);
+}
 
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
   const { rows } = await pool.query(
@@ -37,7 +48,18 @@ router.get('/:id', async (req, res) => {
     return res.status(403).json({ error: 'Not allowed.' });
   }
   const { rows } = await pool.query(
-    `SELECT user_id, role, full_name, email, phone_number, address, avatar_url, status, created_at
+    `SELECT
+    user_id,
+    role,
+    full_name,
+    email,
+    phone_number,
+    province,
+    municipality,
+    barangay,
+    street,
+    status,
+    created_at
      FROM users WHERE user_id = $1`,
     [req.params.id]
   );
