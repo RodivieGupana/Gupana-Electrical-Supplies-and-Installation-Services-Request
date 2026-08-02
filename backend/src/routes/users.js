@@ -35,10 +35,23 @@ router.get('/', requireRole('admin'), async (req, res) => {
 
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
   const { rows } = await pool.query(
-    `SELECT user_id, role, full_name, email, phone_number, address, status, created_at
-     FROM users ${where} ORDER BY created_at DESC`,
-    params
-  );
+  `SELECT
+      user_id,
+      role,
+      full_name,
+      email,
+      phone_number,
+      province,
+      municipality,
+      barangay,
+      street,
+      status,
+      created_at
+   FROM users
+   ${where}
+   ORDER BY created_at DESC`,
+  params
+);
   res.json(rows);
 });
 
@@ -73,12 +86,29 @@ router.put('/:id', async (req, res) => {
   if (req.user.role !== 'admin' && req.user.user_id !== targetId) {
     return res.status(403).json({ error: 'Not allowed.' });
   }
-  const { full_name, phone_number, address, avatar_url, status } = req.body;
+  const {
+  full_name,
+  phone_number,
+  province,
+  municipality,
+  barangay,
+  street,
+  avatar_url,
+  status
+} = req.body;
   const fields = [];
   const params = [];
   let i = 1;
 
-  for (const [key, value] of Object.entries({ full_name, phone_number, address, avatar_url })) {
+  for (const [key, value] of Object.entries({
+  full_name,
+  phone_number,
+  province,
+  municipality,
+  barangay,
+  street,
+  avatar_url
+})) {
     if (value !== undefined) {
       fields.push(`${key} = $${i++}`);
       params.push(value);
@@ -93,7 +123,17 @@ router.put('/:id', async (req, res) => {
   params.push(targetId);
   const { rows } = await pool.query(
     `UPDATE users SET ${fields.join(', ')} WHERE user_id = $${i}
-     RETURNING user_id, role, full_name, email, phone_number, address, status`,
+     RETURNING
+user_id,
+role,
+full_name,
+email,
+phone_number,
+province,
+municipality,
+barangay,
+street,
+status`,
     params
   );
   if (req.user.role === 'admin') await logActivity(req.user.user_id, `Updated user #${targetId}`, 'Users');
