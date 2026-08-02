@@ -799,6 +799,12 @@ async function deleteUser(id) {
   try { await api(`/users/${id}`, { method:'DELETE' }); toast('Client removed.'); renderUsers(); }
   catch (err) { toast(err.message, true); }
 }
+function filterTable(tableId, term) {
+  term = term.toLowerCase();
+  document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
+    tr.style.display = (tr.dataset.search||'').includes(term) ? '' : 'none';
+  });
+}
 
 /* ================= SERVICES ================= */
 async function renderServices() {
