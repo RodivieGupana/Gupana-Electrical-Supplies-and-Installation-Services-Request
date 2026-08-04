@@ -264,6 +264,71 @@ tbody tr:hover{background:#fafcfa;}
   .topbar-logo span{display:none;}
   .user-chip .u-name, .user-chip .u-role{display:none;}
 }
+
+/* ================= Dashboard Hero ================= */
+
+.hero-dashboard{
+  display:grid;
+  grid-template-columns:1.4fr 1fr;
+  gap:24px;
+  align-items:center;
+  background:linear-gradient(135deg,#0d4229,#125c37);
+  color:#fff;
+  border-radius:18px;
+  padding:35px;
+  margin-bottom:20px;
+  overflow:hidden;
+}
+
+.hero-dashboard h1{
+  margin:0;
+  font-size:34px;
+  font-weight:800;
+  line-height:1.2;
+}
+
+.hero-dashboard p{
+  margin:15px 0 25px;
+  font-size:15px;
+  color:#d7efe0;
+  max-width:500px;
+}
+
+.hero-dashboard .btn{
+  width:auto;
+}
+
+.hero-image{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.hero-image img{
+  width:100%;
+  max-width:430px;
+  object-fit:contain;
+}
+
+@media(max-width:900px){
+
+.hero-dashboard{
+grid-template-columns:1fr;
+text-align:center;
+padding:25px;
+}
+
+.hero-dashboard p{
+margin:auto;
+margin-top:15px;
+margin-bottom:25px;
+}
+
+.hero-image img{
+max-width:280px;
+}
+
+}
 </style>
 </head>
 <body>
@@ -634,9 +699,51 @@ async function renderDashboard() {
 
   const main = document.getElementById('mainContent');
   main.innerHTML = `
-    <div class="page-head">
-      <div><h1 class="page-title">Dashboard</h1><p class="page-sub">Overview of your system</p></div>
+    <div class="hero-dashboard">
+
+    <div class="hero-left">
+
+        <span class="hero-badge">
+            ⚡ Welcome Administrator
+        </span>
+
+        <h1>
+            Manage Your Electrical Services Efficiently
+        </h1>
+
+        <p>
+            Monitor appointments, service requests, clients,
+            notifications, and reports from one dashboard.
+        </p>
+
+        <div class="hero-buttons">
+
+            <button class="btn btn-primary"
+                    onclick="navigate('requests')">
+                View Requests
+            </button>
+
+            <button class="btn btn-outline"
+                    onclick="navigate('appointments')">
+                Appointments
+            </button>
+
+        </div>
+
     </div>
+
+    <div class="hero-right">
+
+        <!-- Temporary Placeholder -->
+        <img
+            src="images/electricians.png"
+            alt="Electrician"
+            class="hero-image"
+        >
+
+    </div>
+
+</div>  
     <div class="grid grid-5" style="margin-bottom:18px;">
       <div class="card stat c-green"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div><div class="stat-val">${stats.total_requests}</div><div class="stat-label">Total Requests</div><a class="stat-link" onclick="navigate('requests')">View all requests</a></div>
       <div class="card stat c-amber"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-val">${stats.pending_requests}</div><div class="stat-label">Pending Requests</div><a class="stat-link" onclick="navigate('requests')">View pending</a></div>
