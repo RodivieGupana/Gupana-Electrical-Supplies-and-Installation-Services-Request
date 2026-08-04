@@ -7,33 +7,31 @@ const router = express.Router();
 router.use(authenticate);
 
 const BASE_SELECT = `
-SELECT
-    a.*,
+  SELECT
+      a.*,
 
-    u.user_id,
-    u.full_name AS client_name,
-    u.email AS client_email,
-    u.phone_number AS client_phone,
+      u.full_name AS client_name,
+      u.email AS client_email,
+      u.phone_number AS client_phone,
 
-    s.service_name,
+      s.service_name,
 
-    sr.request_code,
-    sr.address,
-    sr.problem_description,
-    sr.client_comment,
-    sr.admin_comment,
-    sr.status AS request_status
+      sr.request_code,
 
-FROM appointments a
+      CONCAT_WS(', ',
+          sr.street,
+          sr.barangay,
+          sr.municipality,
+          sr.province
+      ) AS client_address,
 
-JOIN users u
-    ON u.user_id = a.client_id
+      sr.problem_description,
+      sr.admin_comment
 
-JOIN services s
-    ON s.service_id = a.service_id
-
-JOIN service_requests sr
-    ON sr.request_id = a.request_id
+  FROM appointments a
+  JOIN users u ON u.user_id = a.client_id
+  JOIN services s ON s.service_id = a.service_id
+  JOIN service_requests sr ON sr.request_id = a.request_id
 `;
 
 // GET /api/appointments  (admin: all; client: own) filterable by ?status=&from=&to=
