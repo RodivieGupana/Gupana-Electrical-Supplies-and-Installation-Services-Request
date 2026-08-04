@@ -946,19 +946,118 @@ async function renderAppointments() {
     <div class="card">
       <div class="tabs">${['All','Confirmed','Pending','Completed','Cancelled'].map(t => `<button class="tab ${apptFilter===t?'active':''}" onclick="apptFilter='${t}'; renderAppointments();">${t}</button>`).join('')}</div>
       <div class="toolbar"><div class="search-box"><i data-lucide="search"></i><input placeholder="Search appointment..." id="apptSearch" oninput="filterTable('apptTable', this.value)"/></div></div>
-      <div style="overflow-x:auto;"><table id="apptTable"><thead><tr><th>Date &amp; Time</th><th>Client</th><th>Service</th><th>Status</th><th></th></tr></thead><tbody>
+      <div style="overflow-x:auto;"><table id="apptTable"><thead><tr><th>Date &amp; Time</th><th>Client</th><th>Service</th><th>Status</th>Actions<th></th></tr></thead><tbody>
       ${appts.map(a => `
         <tr data-search="${(a.client_name+a.service_name).toLowerCase()}">
           <td>${fmtDate(a.appointment_date)}<br/><span class="cell-muted">${fmtTime(a.start_time)} - ${fmtTime(a.end_time)}</span></td>
           <td class="cell-strong">${a.client_name}</td><td>${a.service_name||''}</td><td>${badge(a.status)}</td>
           <td style="white-space:nowrap;">
-            ${a.status!=='completed'&&a.status!=='cancelled' ? `<button class="icon-action" onclick="updateApptStatus(${a.appointment_id},'completed')" title="Mark completed"><i data-lucide="check"></i></button>
-            <button class="icon-action" onclick="updateApptStatus(${a.appointment_id},'cancelled')" title="Cancel"><i data-lucide="x"></i></button>` : ''}
-          </td>
+
+    <button
+        class="icon-action"
+        title="View Details"
+        onclick="viewAppointment(${a.appointment_id})"
+    >
+        <i data-lucide="eye"></i>
+    </button>
+
+    ${a.status !== 'completed' && a.status !== 'cancelled' ? `
+
+        <button
+            class="icon-action"
+            onclick="updateApptStatus(${a.appointment_id},'completed')"
+            title="Mark Completed"
+        >
+            <i data-lucide="check"></i>
+        </button>
+
+        <button
+            class="icon-action"
+            onclick="updateApptStatus(${a.appointment_id},'cancelled')"
+            title="Cancel"
+        >
+            <i data-lucide="x"></i>
+        </button>
+
+    ` : ''}
+
+</td>
         </tr>`).join('') || `<tr><td colspan="5" class="empty-state">No appointments found.</td></tr>`}
       </tbody></table></div>
     </div>
   `;
+}
+
+async function viewAppointment(id) {
+  try {
+
+    const appt = await api(`/appointments/${id}`);
+
+    openModal(`
+      <div class="modal-head">
+        <h3>Appointment Details</h3>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="field">
+          <label>Client Name</label>
+          <input value="${appt.client_name || '-'}" readonly>
+        </div>
+
+        <div class="field">
+          <label>Email</label>
+          <input value="${appt.client_email || '-'}" readonly>
+        </div>
+
+        <div class="field">
+          <label>Phone Number</label>
+          <input value="${appt.client_phone || '-'}" readonly>
+        </div>
+
+        <div class="field">
+          <label>Complete Address</label>
+          <textarea rows="2" readonly>${appt.client_address || '-'}</textarea>
+        </div>
+
+        <div class="field">
+          <label>Service</label>
+          <input value="${appt.service_name || '-'}" readonly>
+        </div>
+
+        <div class="field">
+          <label>Request Code</label>
+          <input value="${appt.request_code || '-'}" readonly>
+        </div>
+
+        <div class="field">
+          <label>Appointment Date</label>
+          <input value="${fmtDate(appt.appointment_date)}" readonly>
+        </div>
+
+        <div class="field">
+          <label>Time</label>
+          <input value="${fmtTime(appt.start_time)} - ${fmtTime(appt.end_time)}" readonly>
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <input value="${appt.status}" readonly>
+        </div>
+
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn btn-primary" onclick="closeModal()">
+          Close
+        </button>
+      </div>
+    `);
+
+  } catch (err) {
+    toast(err.message, true);
+  }
 }
 async function updateApptStatus(id, status) {
   if (DEMO_MODE) { toast(`Appointment set to ${status} (demo mode).`); return renderAppointments(); }
