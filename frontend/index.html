@@ -265,71 +265,104 @@ tbody tr:hover{background:#fafcfa;}
   .user-chip .u-name, .user-chip .u-role{display:none;}
 }
 
-/* ================= Dashboard Hero ================= */
+  /* ================= HERO DASHBOARD ================= */
 
-.hero-dashboard{
-  display:grid;
-  grid-template-columns:1.4fr 1fr;
-  gap:24px;
-  align-items:center;
-  background:linear-gradient(135deg,#0d4229,#125c37);
-  color:#fff;
-  border-radius:18px;
-  padding:35px;
-  margin-bottom:20px;
-  overflow:hidden;
-}
+  .hero-dashboard{
+      position:relative;
 
-.hero-dashboard h1{
-  margin:0;
-  font-size:34px;
-  font-weight:800;
-  line-height:1.2;
-}
+      display:flex;
+      align-items:center;
 
-.hero-dashboard p{
-  margin:15px 0 25px;
-  font-size:15px;
-  color:#d7efe0;
-  max-width:500px;
-}
+      min-height:420px;
 
-.hero-dashboard .btn{
-  width:auto;
-}
+      padding:45px;
 
-.hero-right{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+      border-radius:18px;
 
-.hero-image{
-    width:100%;
-    max-width:700px;   
-    height:auto;
-    object-fit:contain;
-}
+      overflow:hidden;
 
-@media(max-width:900px){
+      margin-bottom:20px;
 
-.hero-dashboard{
-grid-template-columns:1fr;
-text-align:center;
-padding:25px;
-}
+      color:#fff;
 
-.hero-dashboard p{
-margin:auto;
-margin-top:15px;
-margin-bottom:25px;
-}
+      background:
+          linear-gradient(
+              rgba(13,66,41,.82),
+              rgba(13,66,41,.82)
+          ),
+          url("images/electricians.png");
 
-.hero-image{
-  max-width:320px;
-}
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+  }
 
-}
+  .hero-left{
+      max-width:650px;
+      position:relative;
+      z-index:2;
+  }
+
+  .hero-badge{
+      display:inline-block;
+      background:rgba(255,255,255,.15);
+      padding:8px 14px;
+      border-radius:50px;
+      font-size:14px;
+      margin-bottom:18px;
+  }
+
+  .hero-dashboard h1{
+      margin:0;
+      font-size:48px;
+      line-height:1.15;
+      font-weight:800;
+  }
+
+  .hero-dashboard p{
+      margin:20px 0 30px;
+      font-size:18px;
+      line-height:1.7;
+      color:#d8efe2;
+  }
+
+  .hero-buttons{
+      display:flex;
+      gap:15px;
+      flex-wrap:wrap;
+  }
+
+  .hero-dashboard .btn{
+      width:auto;
+  }
+
+  /* Mobile */
+
+  @media(max-width:900px){
+
+  .hero-dashboard{
+      min-height:auto;
+      padding:30px;
+      text-align:center;
+  }
+
+  .hero-left{
+      max-width:100%;
+  }
+
+  .hero-dashboard h1{
+      font-size:34px;
+  }
+
+  .hero-dashboard p{
+      font-size:15px;
+  }
+
+  .hero-buttons{
+      justify-content:center;
+  }
+
+  }
 </style>
 </head>
 <body>
@@ -700,7 +733,7 @@ async function renderDashboard() {
 
   const main = document.getElementById('mainContent');
   main.innerHTML = `
-    <div class="hero-dashboard">
+   <div class="hero-dashboard">
 
     <div class="hero-left">
 
@@ -719,13 +752,15 @@ async function renderDashboard() {
 
         <div class="hero-buttons">
 
-            <button class="btn btn-primary"
-                    onclick="navigate('requests')">
+            <button
+                class="btn btn-primary"
+                onclick="navigate('requests')">
                 View Requests
             </button>
 
-            <button class="btn btn-outline"
-                    onclick="navigate('appointments')">
+            <button
+                class="btn btn-outline"
+                onclick="navigate('appointments')">
                 Appointments
             </button>
 
@@ -735,15 +770,18 @@ async function renderDashboard() {
 
     <div class="hero-right">
 
-        <!-- Temporary Placeholder -->
-        <img
-            src="images/electricians.png"
-            alt="Electrician"
-            class="hero-image"
-        >
+        <div class="hero-image-card">
+
+            <img
+                src="images/electricians.png"
+                alt="Gupana Team"
+                class="hero-image">
+
+        </div>
 
     </div>
 
+</div>
 </div>  
     <div class="grid grid-5" style="margin-bottom:18px;">
       <div class="card stat c-green"><div class="stat-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div><div class="stat-val">${stats.total_requests}</div><div class="stat-label">Total Requests</div><a class="stat-link" onclick="navigate('requests')">View all requests</a></div>
