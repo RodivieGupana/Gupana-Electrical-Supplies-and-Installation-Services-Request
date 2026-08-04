@@ -946,7 +946,7 @@ async function renderAppointments() {
     <div class="card">
       <div class="tabs">${['All','Confirmed','Pending','Completed','Cancelled'].map(t => `<button class="tab ${apptFilter===t?'active':''}" onclick="apptFilter='${t}'; renderAppointments();">${t}</button>`).join('')}</div>
       <div class="toolbar"><div class="search-box"><i data-lucide="search"></i><input placeholder="Search appointment..." id="apptSearch" oninput="filterTable('apptTable', this.value)"/></div></div>
-      <div style="overflow-x:auto;"><table id="apptTable"><thead><tr><th>Date &amp; Time</th><th>Client</th><th>Service</th><th>Status</th>Actions<th></th></tr></thead><tbody>
+      <div style="overflow-x:auto;"><table id="apptTable"><thead><tr><th>Date &amp; Time</th><th>Client</th><th>Service</th><th>Status</th><th></th></tr></thead><tbody>
       ${appts.map(a => `
         <tr data-search="${(a.client_name+a.service_name).toLowerCase()}">
           <td>${fmtDate(a.appointment_date)}<br/><span class="cell-muted">${fmtTime(a.start_time)} - ${fmtTime(a.end_time)}</span></td>
