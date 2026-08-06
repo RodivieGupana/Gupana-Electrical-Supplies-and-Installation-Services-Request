@@ -914,7 +914,12 @@ function filterTable(tableId, term) {
 
 async function renderScheduleBlocks() {
 
-    const main = document.getElementById('mainContent');
+    const schedules = await loadList(
+    [],
+    "/schedule-blocks"
+);
+
+const main = document.getElementById("mainContent");
 
     main.innerHTML = `
 
@@ -926,8 +931,8 @@ async function renderScheduleBlocks() {
             </p>
         </div>
 
-        <button class="btn btn-yellow">
-            + Add Schedule
+        <button class="btn btn-yellow" onclick="openScheduleModal()">
+    + Add Schedule
         </button>
     </div>
 
@@ -947,41 +952,129 @@ async function renderScheduleBlocks() {
 
             <tbody>
 
+          ${schedules.map(s => `
+
                 <tr>
 
-                    <td>July 20, 2026</td>
+                <td>${fmtDate(s.block_date)}</td>
 
-                    <td>8:00 AM - 10:00 AM</td>
+                <td>
+                ${fmtTime(s.start_time)}
+                -
+                ${fmtTime(s.end_time)}
+                </td>
 
-                    <td>3</td>
+                <td>${s.capacity}</td>
 
-                    <td>
-                        <span class="badge badge-active">
-                            Available
-                        </span>
-                    </td>
+                <td>
 
-                    <td>
+                ${s.is_available
+                ?
+                '<span class="badge badge-active">Available</span>'
+                :
+                '<span class="badge badge-inactive">Unavailable</span>'
+                }
 
-                        <button class="icon-action">
-                            Edit
-                        </button>
+                </td>
 
-                        <button class="icon-action">
-                            Delete
-                        </button>
+                <td>
 
-                    </td>
+                <button class="icon-action">
+                Edit
+                </button>
+
+                <button class="icon-action">
+                Delete
+                </button>
+
+                </td>
 
                 </tr>
 
-            </tbody>
+                `).join("")}
+
+</tbody>
 
         </table>
+        
 
     </div>
+    
 
     `;
+
+}
+
+function openScheduleModal() {
+
+    openModal(`
+
+    <div class="modal-head">
+        <h3>Add Schedule</h3>
+
+        <button class="modal-close" onclick="closeModal()">
+            ✕
+        </button>
+    </div>
+
+    <form id="scheduleForm">
+
+        <div class="modal-body">
+
+            <div class="field">
+                <label>Date</label>
+                <input type="date" id="sb_date" required>
+            </div>
+
+            <div class="field">
+                <label>Start Time</label>
+                <input type="time" id="sb_start" required>
+            </div>
+
+            <div class="field">
+                <label>End Time</label>
+                <input type="time" id="sb_end" required>
+            </div>
+
+            <div class="field">
+                <label>Capacity</label>
+                <input type="number" id="sb_capacity" value="3" min="1" required>
+            </div>
+
+        </div>
+
+        <div class="modal-foot">
+
+            <button
+                type="button"
+                class="btn btn-outline"
+                onclick="closeModal()">
+                Cancel
+            </button>
+
+            <button
+                type="submit"
+                class="btn btn-primary">
+                Save Schedule
+            </button>
+
+        </div>
+
+    </form>
+
+    `);
+
+    document
+        .getElementById("scheduleForm")
+        .addEventListener("submit", function(e){
+
+            e.preventDefault();
+
+            alert("Schedule Saved");
+
+            closeModal();
+
+        });
 
 }
 
