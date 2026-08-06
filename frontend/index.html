@@ -1337,14 +1337,17 @@ function viewRequest(r) {
 </div>
 
 </div>
-      <div class="field"><label>Address</label>
-          <div>
-            ${r.street || ''},
-            Brgy. ${r.barangay || ''},
-            ${r.municipality || ''},
-            ${r.province || ''}
-          </div></div></div>
+      <div class="field">
+    <label>Address</label>
+
+    <div>
+        ${r.street || ''},
+        Brgy. ${r.barangay || ''},
+        ${r.municipality || ''},
+        ${r.province || ''}
     </div>
+
+</div>
     <div class="modal-foot" style="flex-wrap:wrap;">
       ${r.status==='pending' ? `<button class="btn btn-primary" onclick="scheduleAppointment(${JSON.stringify(r).replace(/"/g,'&quot;')})">Approve &amp; Schedule</button><button class="btn btn-danger-outline" onclick="updateRequestStatus(${r.request_id},'cancelled')">Decline</button>` : ''}
       ${r.status==='approved' ? `<button class="btn btn-primary" onclick="updateRequestStatus(${r.request_id},'completed')">Mark Completed</button>` : ''}
