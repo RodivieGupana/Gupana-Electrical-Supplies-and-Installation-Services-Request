@@ -673,8 +673,8 @@ async function navigate(view) {
     switch (view) {
       case 'dashboard': await renderDashboard(); break;
       case 'users': await renderUsers(); break;
-      case 'scheduleBlocks':renderScheduleBlocks(); break;
       case 'services': await renderServices(); break;
+      case 'scheduleBlocks':renderScheduleBlocks(); break;
       case 'requests': await renderRequests(); break;
       case 'appointments': await renderAppointments(); break;
       case 'inquiries': await renderInquiries(); break;
@@ -912,9 +912,76 @@ function filterTable(tableId, term) {
 
 /* ================= SCHEDULE BLOCKS ================= */
 
-async function renderScheduleBlocks(){
+async function renderScheduleBlocks() {
 
-    alert("Schedule Blocks Page");
+    const main = document.getElementById('mainContent');
+
+    main.innerHTML = `
+
+    <div class="page-head">
+        <div>
+            <h1 class="page-title">Schedule Blocks</h1>
+            <p class="page-sub">
+                Manage available schedules for clients
+            </p>
+        </div>
+
+        <button class="btn btn-yellow">
+            + Add Schedule
+        </button>
+    </div>
+
+    <div class="card">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+
+                    <td>July 20, 2026</td>
+
+                    <td>8:00 AM - 10:00 AM</td>
+
+                    <td>3</td>
+
+                    <td>
+                        <span class="badge badge-active">
+                            Available
+                        </span>
+                    </td>
+
+                    <td>
+
+                        <button class="icon-action">
+                            Edit
+                        </button>
+
+                        <button class="icon-action">
+                            Delete
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    `;
 
 }
 
