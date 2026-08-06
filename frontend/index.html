@@ -1267,7 +1267,7 @@ async function deleteService(id) {
 
 /* ================= SERVICE REQUESTS ================= */
 let requestsFilter = 'All';
-async function renderRequests() {
+async function renderServiceRequests() {
   const requests = await loadList(DEMO.requests, `/service-requests${requestsFilter!=='All' ? '?status='+requestsFilter.toLowerCase() : ''}`);
   const main = document.getElementById('mainContent');
   main.innerHTML = `
@@ -1275,10 +1275,41 @@ async function renderRequests() {
     <div class="card">
       <div class="tabs">${['All','Pending','Approved','Completed','Cancelled'].map(t => `<button class="tab ${requestsFilter===t?'active':''}" onclick="requestsFilter='${t}'; renderRequests();">${t}</button>`).join('')}</div>
       <div class="toolbar"><div class="search-box"><i data-lucide="search"></i><input placeholder="Search request, client, or service..." id="reqSearch" oninput="filterTable('reqTable', this.value)"/></div></div>
-      <div style="overflow-x:auto;"><table id="reqTable"><thead><tr><th>Request ID</th><th>Client</th><th>Service</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>
+      <div style="overflow-x:auto;"><table id="reqTable"><thead>
+          <tr>
+          <th>Request ID</th>
+          <th>Client</th>
+          <th>Service</th>
+          <th>Preferred Schedule</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th></th>
+          </tr>
+          </thead><tbody>
       ${requests.map(r => `
         <tr data-search="${(r.request_code+r.client_name+r.service_name).toLowerCase()}">
-          <td class="cell-strong">${r.request_code}</td><td>${r.client_name}</td><td>${r.service_name}</td><td class="cell-muted">${fmtDate(r.created_at)}</td><td>${badge(r.status)}</td>
+          <td class="cell-strong">${r.request_code}</td><td>${r.client_name}</td>
+
+<td>${r.service_name}</td>
+
+            <td>
+            ${
+            r.preferred_date
+            ?
+            `${fmtDate(r.preferred_date)}
+            •
+            ${fmtTime(r.preferred_start_time)}
+            -
+            ${fmtTime(r.preferred_end_time)}`
+            :
+            'No schedule'
+            }
+            </td>
+
+            <td class="cell-muted">${fmtDate(r.created_at)}</td>
+
+            <td>${badge(r.status)}
+            </td>
           <td style="white-space:nowrap;"><button class="icon-action" onclick='viewRequest(${JSON.stringify(r).replace(/'/g,"&#39;")})'><i data-lucide="eye"></i></button></td>
         </tr>`).join('') || `<tr><td colspan="6" class="empty-state">No service requests found.</td></tr>`}
       </tbody></table></div>
@@ -1293,7 +1324,28 @@ function viewRequest(r) {
       <div class="field"><label>Client</label><div class="cell-strong">${r.client_name}</div></div>
       <div class="field"><label>Service</label><div>${r.service_name}</div></div>
       <div class="field"><label>Problem description</label><div style="font-size:13px; color:var(--muted);">${r.problem_description||'—'}</div></div>
-      <div class="field"><label>Preferred schedule</label><div>${r.block_date ? fmtDate(r.block_date)+' • '+fmtTime(r.start_time)+' - '+fmtTime(r.end_time) : 'No preference specified'}</div></div>
+      <div class="field"><label>Preferred schedule</label><<label>Preferred Schedule</label>
+
+<div>
+
+${
+r.preferred_date
+
+?
+
+`${fmtDate(r.preferred_date)}
+•
+${fmtTime(r.preferred_start_time)}
+-
+${fmtTime(r.preferred_end_time)}`
+
+:
+
+'No schedule selected'
+
+}
+
+</div>
       <div class="field"><label>Address</label>
           <div>
             ${r.street || ''},
@@ -1323,10 +1375,10 @@ function scheduleAppointment(r) {
     <form id="apptForm">
       <div class="modal-body">
         <p class="cell-muted" style="margin-top:0;">Assign a confirmed appointment slot for <b>${r.client_name}</b> — ${r.service_name}</p>
-        <div class="field"><label>Date</label><input type="date" id="af_date" value="${r.block_date||''}" required/></div>
+        <div class="field"><label>Date</label><input type="date" id="af_date" value="${r.preferred_date || ''}" required/></div>
         <div style="display:flex; gap:10px;">
-          <div class="field" style="flex:1;"><label>Start time</label><input type="time" id="af_start" value="${r.start_time||'08:00'}" required/></div>
-          <div class="field" style="flex:1;"><label>End time</label><input type="time" id="af_end" value="${r.end_time||'10:00'}" required/></div>
+          <div class="field" style="flex:1;"><label>Start time</label><input type="time" id="af_start" value="${r.preferred_start_time || '08:00'}" required/></div>
+          <div class="field" style="flex:1;"><label>End time</label><input type="time" id="af_end" value="${r.preferred_end_time || '10:00'}"" required/></div>
         </div>
         <div class="field">
   <label>Location</label>
