@@ -1267,7 +1267,7 @@ async function deleteService(id) {
 
 /* ================= SERVICE REQUESTS ================= */
 let requestsFilter = 'All';
-async function renderServiceRequests() {
+async function renderRequests() {
   const requests = await loadList(DEMO.requests, `/service-requests${requestsFilter!=='All' ? '?status='+requestsFilter.toLowerCase() : ''}`);
   const main = document.getElementById('mainContent');
   main.innerHTML = `
