@@ -586,10 +586,23 @@ async function openNewRequestModal(preselectServiceId) {
         </div>
         <div class="field"><label>Problem Description</label><textarea id="nr_desc" rows="3" placeholder="Please describe the problem..." required></textarea></div>
         <div class="field"><label>Preferred Schedule</label>
-          <select id="nr_block">
-            <option value="">No preference</option>
-            ${blocks.map(b => `<option value="${b.block_id}">${fmtDate(b.block_date)} • ${fmtTime(b.start_time)} - ${fmtTime(b.end_time)}</option>`).join('')}
-          </select>
+          <select id="nr_block" required>
+
+            <option value="">
+            Select Schedule
+            </option>
+
+            ${blocks.map(b => `
+            <option value="${b.block_id}">
+            ${fmtDate(b.block_date)}
+            •
+            ${fmtTime(b.start_time)}
+            -
+            ${fmtTime(b.end_time)}
+            </option>
+            `).join("")}
+
+            </select>
         </div>
        <div class="field">
           <label>Province</label>
@@ -619,8 +632,7 @@ async function openNewRequestModal(preselectServiceId) {
     const payload = {
               service_id: Number(document.getElementById('nr_service').value),
               problem_description: document.getElementById('nr_desc').value,
-              preferred_block_id: document.getElementById('nr_block').value || null,
-
+              preferred_block_id:Number(document.getElementById("nr_block").value),
               province: document.getElementById('nr_province').value,
               municipality: document.getElementById('nr_municipality').value,
               barangay: document.getElementById('nr_barangay').value,
@@ -695,10 +707,10 @@ function viewRequestDetail(r) {
         <label>Preferred Schedule</label>
         <div>
           ${
-            r.block_date
-            ? `${fmtDate(r.block_date)} • ${fmtTime(r.start_time)} - ${fmtTime(r.end_time)}`
-            : 'No preference specified'
-          }
+                r.preferred_date
+                ? `${fmtDate(r.preferred_date)} • ${fmtTime(r.preferred_start_time)} - ${fmtTime(r.preferred_end_time)}`
+                : 'No preference specified'
+            }
         </div>
       </div>
 
