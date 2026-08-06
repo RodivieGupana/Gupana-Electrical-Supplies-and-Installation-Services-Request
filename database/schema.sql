@@ -70,7 +70,6 @@ CREATE TABLE service_requests (
     admin_comment        TEXT,
     preferred_block_id INTEGER REFERENCES schedule_blocks(block_id),
     assigned_block_id INTEGER REFERENCES schedule_blocks(block_id),
-    admin_comment TEXT,
     province VARCHAR(100),
     municipality VARCHAR(100),
     barangay VARCHAR(100),
