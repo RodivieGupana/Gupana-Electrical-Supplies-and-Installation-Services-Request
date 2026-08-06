@@ -1083,16 +1083,48 @@ function openScheduleModal() {
     `);
 
     document
-        .getElementById("scheduleForm")
-        .addEventListener("submit", function(e){
+.getElementById("scheduleForm")
+.addEventListener("submit", async function(e){
 
-            e.preventDefault();
+    e.preventDefault();
 
-            alert("Schedule Saved");
+    const payload = {
 
-            closeModal();
+        block_date: document.getElementById("sb_date").value,
+
+        start_time: document.getElementById("sb_start").value,
+
+        end_time: document.getElementById("sb_end").value,
+
+        capacity: parseInt(document.getElementById("sb_capacity").value)
+
+    };
+
+    try{
+
+        await api("/schedule-blocks",{
+
+            method:"POST",
+
+            body: JSON.stringify(payload)
 
         });
+
+        toast("Schedule Added.");
+
+        closeModal();
+
+        renderScheduleBlocks();
+
+    }
+
+    catch(err){
+
+        toast(err.message,true);
+
+    }
+
+});
 
 }
 
