@@ -914,8 +914,8 @@ function filterTable(tableId, term) {
 
 async function renderScheduleBlocks() {
 
-    const schedules = await loadList(
-    [],
+   const schedules = await loadList(
+    DEMO.scheduleBlocks || [],
     "/schedule-blocks"
 );
 
@@ -950,40 +950,44 @@ const main = document.getElementById("mainContent");
                 </tr>
             </thead>
 
-            <tbody>
+           <tbody>
 
-          ${schedules.map(s => `
+                ${
+                schedules.length ?
+
+                schedules.map(s=>`
 
                 <tr>
 
                 <td>${fmtDate(s.block_date)}</td>
 
-                <td>
-                ${fmtTime(s.start_time)}
-                -
-                ${fmtTime(s.end_time)}
-                </td>
+                <td>${fmtTime(s.start_time)} - ${fmtTime(s.end_time)}</td>
 
                 <td>${s.capacity}</td>
 
                 <td>
 
-                ${s.is_available
-                ?
-                '<span class="badge badge-active">Available</span>'
-                :
-                '<span class="badge badge-inactive">Unavailable</span>'
-                }
+                <span class="badge badge-active">
+
+                ${s.is_available ? "Available" : "Unavailable"}
+
+                </span>
 
                 </td>
 
                 <td>
 
-                <button class="icon-action">
+                <button
+                class="icon-action"
+                onclick='openScheduleModal(${JSON.stringify(s)})'
+                >
                 Edit
                 </button>
 
-                <button class="icon-action">
+                <button
+                class="icon-action"
+                onclick="deleteSchedule(${s.block_id})"
+                >
                 Delete
                 </button>
 
@@ -991,9 +995,23 @@ const main = document.getElementById("mainContent");
 
                 </tr>
 
-                `).join("")}
+                `).join('')
 
-</tbody>
+                :
+
+                `<tr>
+
+                <td colspan="5" class="empty-state">
+
+                No schedules found.
+
+                </td>
+
+                </tr>`
+
+                }
+
+          </tbody>
 
         </table>
         
