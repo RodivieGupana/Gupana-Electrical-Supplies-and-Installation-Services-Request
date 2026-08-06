@@ -1324,20 +1324,18 @@ function viewRequest(r) {
       <div class="field"><label>Client</label><div class="cell-strong">${r.client_name}</div></div>
       <div class="field"><label>Service</label><div>${r.service_name}</div></div>
      <div class="field">
-    <label>Preferred Schedule</label>
+      <label>Preferred Schedule</label>
 
-    <div>
-        ${
-            r.preferred_date
-            ? `${fmtDate(r.preferred_date)} • ${fmtTime(r.preferred_start_time)} - ${fmtTime(r.preferred_end_time)}`
-            : 'No schedule selected'
-        }
+            <div>
+                ${
+                    r.preferred_date
+                    ? `${fmtDate(r.preferred_date)} • ${fmtTime(r.preferred_start_time)} - ${fmtTime(r.preferred_end_time)}`
+                    : 'No schedule selected'
+                }
+            </div>
+
     </div>
-
-</div>
-
-</div>
-      <div class="field">
+    <div class="field">
     <label>Address</label>
 
     <div>
