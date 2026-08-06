@@ -667,6 +667,7 @@ async function navigate(view) {
     switch (view) {
       case 'dashboard': await renderDashboard(); break;
       case 'users': await renderUsers(); break;
+      case 'scheduleBlocks':renderScheduleBlocks(); break;
       case 'services': await renderServices(); break;
       case 'requests': await renderRequests(); break;
       case 'appointments': await renderAppointments(); break;
@@ -901,6 +902,14 @@ function filterTable(tableId, term) {
   document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
     tr.style.display = (tr.dataset.search||'').includes(term) ? '' : 'none';
   });
+}
+
+/* ================= SCHEDULE BLOCKS ================= */
+
+async function renderScheduleBlocks(){
+
+    alert("Schedule Blocks Page");
+
 }
 
 /* ================= SERVICES ================= */
