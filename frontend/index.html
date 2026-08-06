@@ -1046,7 +1046,7 @@ function openScheduleModal(schedule = null) {
                 <input
                 type="date"
                 id="sb_date"
-                value="${editing ? schedule.block_date : ''}"
+                value="${editing ? new Date(schedule.block_date).toISOString().split('T')[0] : ''}"
                 required>
             </div>
 
