@@ -7,13 +7,37 @@ const router = express.Router();
 router.use(authenticate);
 
 const BASE_SELECT = `
-  SELECT sr.*, u.full_name AS client_name, u.email AS client_email,
-         s.service_name, s.category,
-         sb.block_date, sb.start_time, sb.end_time
-  FROM service_requests sr
-  JOIN users u ON u.user_id = sr.client_id
-  JOIN services s ON s.service_id = sr.service_id
-  LEFT JOIN schedule_blocks sb ON sb.block_id = sr.preferred_block_id
+SELECT
+    sr.*,
+
+    u.full_name AS client_name,
+    u.email AS client_email,
+    u.phone_number,
+
+    s.service_name,
+    s.category,
+
+    sb.block_date AS preferred_date,
+    sb.start_time AS preferred_start_time,
+    sb.end_time AS preferred_end_time,
+
+    ab.block_date AS assigned_date,
+    ab.start_time AS assigned_start_time,
+    ab.end_time AS assigned_end_time
+
+FROM service_requests sr
+
+JOIN users u
+ON u.user_id = sr.client_id
+
+JOIN services s
+ON s.service_id = sr.service_id
+
+LEFT JOIN schedule_blocks sb
+ON sb.block_id = sr.preferred_block_id
+
+LEFT JOIN schedule_blocks ab
+ON ab.block_id = sr.assigned_block_id
 `;
 
 // GET /api/service-requests  (admin: all, filterable; client: own only)
@@ -98,32 +122,138 @@ router.post('/', requireRole('client'), async (req, res) => {
   res.status(201).json(rows[0]);
 });
 
-// PUT /api/service-requests/:id/status  (admin: approve / complete / cancel)
+// PUT /api/service-requests/:id/status
 router.put('/:id/status', requireRole('admin'), async (req, res) => {
-  const { status, admin_comment } = req.body;
-  const allowed = ['pending', 'approved', 'completed', 'cancelled'];
-  if (!allowed.includes(status)) return res.status(400).json({ error: 'Invalid status.' });
 
-  const { rows } = await pool.query(
-    `UPDATE service_requests
-     SET
-        status = $1,
-        admin_comment = $2,
-        updated_at = NOW()
-     WHERE request_id = $3
-     RETURNING *`,
-    [
+    const {
         status,
-        admin_comment || null,
-        req.params.id
-    ]
-);
-  const request = rows[0];
-  if (!request) return res.status(404).json({ error: 'Service request not found.' });
+        admin_comment,
+        assigned_block_id
+    } = req.body;
 
-  await notify(request.client_id, 'Service Request Update', `Your request ${request.request_code} is now ${status}.`, 'request', request.request_id);
-  await logActivity(req.user.user_id, `Set request ${request.request_code} to ${status}`, 'Service Requests');
-  res.json(request);
+    const allowed = [
+        'pending',
+        'approved',
+        'completed',
+        'cancelled'
+    ];
+
+    if (!allowed.includes(status)) {
+        return res.status(400).json({
+            error: 'Invalid status.'
+        });
+    }
+
+    const oldRequest = await pool.query(
+        `SELECT * FROM service_requests
+         WHERE request_id=$1`,
+        [req.params.id]
+    );
+
+    if (!oldRequest.rows.length) {
+        return res.status(404).json({
+            error: 'Service request not found.'
+        });
+    }
+
+    const previousBlock =
+        oldRequest.rows[0].assigned_block_id;
+
+    const { rows } = await pool.query(
+
+        `UPDATE service_requests
+
+        SET
+
+        status=$1,
+
+        admin_comment=$2,
+
+        assigned_block_id=$3,
+
+        updated_at=NOW()
+
+        WHERE request_id=$4
+
+        RETURNING *`,
+
+        [
+
+            status,
+
+            admin_comment || null,
+
+            assigned_block_id || null,
+
+            req.params.id
+
+        ]
+
+    );
+
+    const request = rows[0];
+
+    if (
+        previousBlock != assigned_block_id
+    ) {
+
+        await pool.query(
+
+        `INSERT INTO schedule_history
+        (
+            request_id,
+            old_block_id,
+            new_block_id,
+            changed_by
+        )
+
+        VALUES
+        (
+            $1,$2,$3,$4
+        )`,
+
+        [
+
+            request.request_id,
+
+            previousBlock,
+
+            assigned_block_id,
+
+            req.user.user_id
+
+        ]
+
+        );
+
+    }
+
+    await notify(
+
+        request.client_id,
+
+        'Schedule Updated',
+
+        'Your service request schedule has been updated.',
+
+        'request',
+
+        request.request_id
+
+    );
+
+    await logActivity(
+
+        req.user.user_id,
+
+        `Updated request ${request.request_code}`,
+
+        'Service Requests'
+
+    );
+
+    res.json(request);
+
 });
 
 // DELETE /api/service-requests/:id  (admin only)

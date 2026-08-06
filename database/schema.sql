@@ -68,11 +68,13 @@ CREATE TABLE service_requests (
     service_id          INTEGER NOT NULL REFERENCES services(service_id),
     problem_description  TEXT,
     admin_comment        TEXT,
-    preferred_block_id  INTEGER REFERENCES schedule_blocks(block_id),
+    preferred_block_id INTEGER REFERENCES schedule_blocks(block_id),
+    assigned_block_id INTEGER REFERENCES schedule_blocks(block_id),
+    admin_comment TEXT,
     province VARCHAR(100),
     municipality VARCHAR(100),
     barangay VARCHAR(100),
-    street VARCHAR(255)
+    street VARCHAR(255),
     status               VARCHAR(20) NOT NULL DEFAULT 'pending'
                           CHECK (status IN ('pending', 'approved', 'completed', 'cancelled')),
     created_at           TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -104,6 +106,36 @@ CREATE TABLE appointments (
 
 CREATE INDEX idx_appointments_client ON appointments(client_id);
 CREATE INDEX idx_appointments_date ON appointments(appointment_date);
+
+-- ============================================================================
+-- SCHEDULE HISTORY
+-- ============================================================================
+
+CREATE TABLE schedule_history (
+
+    history_id SERIAL PRIMARY KEY,
+
+    request_id INTEGER NOT NULL
+        REFERENCES service_requests(request_id)
+        ON DELETE CASCADE,
+
+    old_block_id INTEGER
+        REFERENCES schedule_blocks(block_id),
+
+    new_block_id INTEGER
+        REFERENCES schedule_blocks(block_id),
+
+    changed_by INTEGER
+        REFERENCES users(user_id),
+
+    reason TEXT,
+
+    changed_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_schedule_history_request
+ON schedule_history(request_id);
 
 -- ============================================================================
 -- INQUIRIES

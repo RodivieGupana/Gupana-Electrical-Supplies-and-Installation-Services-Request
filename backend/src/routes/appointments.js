@@ -90,6 +90,28 @@ router.post('/', requireRole('admin'), async (req, res) => {
   if (!reqRow.rows[0]) return res.status(404).json({ error: 'Service request not found.' });
   const { client_id, service_id, request_code } = reqRow.rows[0];
 
+  // ================= CHECK SCHEDULE CONFLICT =================
+const conflict = await pool.query(
+  `
+  SELECT appointment_id
+  FROM appointments
+  WHERE appointment_date = $1
+    AND status IN ('confirmed','pending')
+    AND (
+      start_time < $3
+      AND end_time > $2
+    )
+  `,
+  [appointment_date, start_time, end_time]
+);
+
+if (conflict.rows.length > 0) {
+  return res.status(409).json({
+    error: 'The selected schedule is already occupied. Please choose another time.'
+  });
+}
+// ==========================================================
+
   const { rows } = await pool.query(
     `INSERT INTO appointments (request_id, client_id, service_id, appointment_date, start_time, end_time, location, note, status, assigned_by)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'confirmed', $9) RETURNING *`,
