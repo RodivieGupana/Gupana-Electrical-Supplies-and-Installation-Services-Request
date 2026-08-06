@@ -1128,6 +1128,32 @@ function openScheduleModal() {
 
 }
 
+async function deleteSchedule(id) {
+
+    if (!confirm("Delete this schedule?")) return;
+
+    try {
+
+        await api(`/schedule-blocks/${id}`, {
+
+            method: "DELETE"
+
+        });
+
+        toast("Schedule deleted.");
+
+        renderScheduleBlocks();
+
+    }
+
+    catch(err){
+
+        toast(err.message, true);
+
+    }
+
+}
+
 /* ================= SERVICES ================= */
 async function renderServices() {
   const services = await loadList(DEMO.services, '/services');
