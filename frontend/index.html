@@ -1612,8 +1612,12 @@ async function markAllRead() {
 }
 
 /* ================= REPORTS ================= */
+
 let currentClientSearchResults = [];
 let currentClientSearchText = '';
+
+let currentReportRows = [];
+let currentReportType = '';
 async function renderReports() {
   const main = document.getElementById('mainContent');
   const today = new Date().toISOString().slice(0,10);
@@ -1635,7 +1639,9 @@ async function renderReports() {
       </div>
       <div style="display:flex; gap:10px; margin-top:6px;">
         <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
-        <button class="btn btn-outline" onclick="toast('Export requires a connected backend to produce a PDF/CSV file.')">Export</button>
+        <button class="btn btn-outline" onclick="exportReport()">
+          Export
+        </button>
       </div>
       <div id="reportResults" style="margin-top:22px;"></div>
 
@@ -1699,7 +1705,10 @@ async function generateReport() {
     catch (e) { box.innerHTML = `<div class="empty-state">${e.message}</div>`; return; }
   }
 
+  
   if (!rows.length) { box.innerHTML = '<div class="empty-state">No records found for this range.</div>'; return; }
+  currentReportRows = rows;
+  currentReportType = type;
   const cols = Object.keys(rows[0]).filter(k => !k.toLowerCase().includes('_id'));
   box.innerHTML = `<div style="overflow-x:auto;"><table><thead><tr>${cols.map(c=>`<th>${c.replace(/_/g,' ')}</th>`).join('')}</tr></thead><tbody>
     ${rows.map(r => `<tr>${cols.map(c=>`<td>${typeof r[c]==='string'&&r[c].match(/^\d{4}-\d{2}-\d{2}/) ? fmtDate(r[c]) : (r[c]??'—')}</td>`).join('')}</tr>`).join('')}
@@ -1915,6 +1924,63 @@ function printClientSearch() {
   setTimeout(() => {
     printWindow.print();
   }, 300);
+}
+
+function exportReport() {
+
+  if (!currentReportRows.length) {
+    toast('Please generate a report first.', true);
+    return;
+  }
+
+  const rows = currentReportRows;
+
+  const cols = Object.keys(rows[0])
+    .filter(k => !k.toLowerCase().includes('_id'));
+
+  const header = cols.map(c =>
+    `"${c.replace(/_/g, ' ')}"`
+  ).join(',');
+
+  const body = rows.map(row =>
+    cols.map(c => {
+
+      let value = row[c] ?? '';
+
+      value = String(value)
+        .replace(/"/g, '""')
+        .replace(/\n/g, ' ');
+
+      return `"${value}"`;
+
+    }).join(',')
+  ).join('\n');
+
+  const csv = header + '\n' + body;
+
+  const blob = new Blob(
+    [csv],
+    { type: 'text/csv;charset=utf-8;' }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+
+  link.href = url;
+
+  link.download =
+    `${currentReportType}_report.csv`;
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+
+  toast('Report exported successfully.');
 }
 
 /* ================= ACTIVITY LOGS ================= */
