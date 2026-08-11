@@ -1636,6 +1636,28 @@ async function renderReports() {
         <button class="btn btn-outline" onclick="toast('Export requires a connected backend to produce a PDF/CSV file.')">Export</button>
       </div>
       <div id="reportResults" style="margin-top:22px;"></div>
+
+<hr style="margin:28px 0; border:0; border-top:1px solid var(--border);">
+
+<div>
+  <h3 style="margin-bottom:6px;">Client Search</h3>
+  <p class="page-sub" style="margin-bottom:14px;">
+    Search clients by full name or address
+  </p>
+
+  <div class="search-box" style="max-width:500px;">
+    <i data-lucide="search"></i>
+
+    <input
+      type="text"
+      id="clientSearchInput"
+      placeholder="Search name, purok, barangay, municipality..."
+      oninput="searchClients()"
+    />
+  </div>
+
+  <div id="clientSearchResults" style="margin-top:18px;"></div>
+</div>
     </div>
   `;
 }
@@ -1660,6 +1682,96 @@ async function generateReport() {
   box.innerHTML = `<div style="overflow-x:auto;"><table><thead><tr>${cols.map(c=>`<th>${c.replace(/_/g,' ')}</th>`).join('')}</tr></thead><tbody>
     ${rows.map(r => `<tr>${cols.map(c=>`<td>${typeof r[c]==='string'&&r[c].match(/^\d{4}-\d{2}-\d{2}/) ? fmtDate(r[c]) : (r[c]??'—')}</td>`).join('')}</tr>`).join('')}
   </tbody></table></div>`;
+}
+
+async function searchClients() {
+
+  const input = document.getElementById('clientSearchInput');
+  const box = document.getElementById('clientSearchResults');
+
+  const search = input.value.trim();
+
+  if (!search) {
+    box.innerHTML = '';
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="empty-state">
+      Searching...
+    </div>
+  `;
+
+  try {
+
+    const clients = await api(
+      `/reports/client-search?search=${encodeURIComponent(search)}`
+    );
+
+    if (!clients.length) {
+      box.innerHTML = `
+        <div class="empty-state">
+          No clients found.
+        </div>
+      `;
+      return;
+    }
+
+    box.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table>
+
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Address</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            ${clients.map(c => `
+              <tr>
+
+                <td class="cell-strong">
+                  ${c.full_name || '—'}
+                </td>
+
+                <td>
+                  ${c.email || '—'}
+                </td>
+
+                <td>
+                  ${c.phone_number || '—'}
+                </td>
+
+                <td>
+                  ${c.street || ''},
+                  Brgy. ${c.barangay || ''},
+                  ${c.municipality || ''},
+                  ${c.province || ''}
+                </td>
+
+              </tr>
+            `).join('')}
+
+          </tbody>
+
+        </table>
+      </div>
+    `;
+
+  } catch (err) {
+
+    box.innerHTML = `
+      <div class="empty-state">
+        ${err.message}
+      </div>
+    `;
+
+  }
 }
 
 /* ================= ACTIVITY LOGS ================= */

@@ -98,4 +98,48 @@ router.get('/generate', async (req, res) => {
   res.json({ type: type || 'service_requests', date_from: dateFrom, date_to: dateTo, rows });
 });
 
+// GET /api/reports/client-search?search=
+router.get('/client-search', async (req, res) => {
+
+  const search = (req.query.search || '').trim();
+
+  if (!search) {
+    return res.json([]);
+  }
+
+  const { rows } = await pool.query(
+    `
+    SELECT DISTINCT
+      u.user_id,
+      u.full_name,
+      u.email,
+      u.phone_number,
+      sr.province,
+      sr.municipality,
+      sr.barangay,
+      sr.street
+
+    FROM users u
+
+    LEFT JOIN service_requests sr
+      ON sr.client_id = u.user_id
+
+    WHERE u.role = 'client'
+
+      AND (
+        u.full_name ILIKE $1
+        OR sr.province ILIKE $1
+        OR sr.municipality ILIKE $1
+        OR sr.barangay ILIKE $1
+        OR sr.street ILIKE $1
+      )
+
+    ORDER BY u.full_name ASC
+    `,
+    [`%${search}%`]
+  );
+
+  res.json(rows);
+});
+
 module.exports = router;
