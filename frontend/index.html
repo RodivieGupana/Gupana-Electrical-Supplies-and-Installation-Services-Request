@@ -1612,6 +1612,8 @@ async function markAllRead() {
 }
 
 /* ================= REPORTS ================= */
+let currentClientSearchResults = [];
+let currentClientSearchText = '';
 async function renderReports() {
   const main = document.getElementById('mainContent');
   const today = new Date().toISOString().slice(0,10);
@@ -1645,7 +1647,27 @@ async function renderReports() {
     Search clients by full name or address
   </p>
 
-  <div class="search-box" style="max-width:500px;">
+  <div style="display:flex; gap:10px; align-items:center; max-width:700px;">
+
+  <div class="search-box" style="flex:1;">
+    <i data-lucide="search"></i>
+
+    <input
+      type="text"
+      id="clientSearchInput"
+      placeholder="Search name, purok, barangay, municipality..."
+      oninput="searchClients()"
+    />
+  </div>
+
+  <button
+    class="btn btn-outline"
+    onclick="printClientSearch()"
+  >
+    🖨 Print
+  </button>
+
+</div>
     <i data-lucide="search"></i>
 
     <input
@@ -1707,6 +1729,8 @@ async function searchClients() {
     const clients = await api(
       `/reports/client-search?search=${encodeURIComponent(search)}`
     );
+    currentClientSearchResults = clients;
+    currentClientSearchText = search;
 
     if (!clients.length) {
       box.innerHTML = `
@@ -1772,6 +1796,125 @@ async function searchClients() {
     `;
 
   }
+}
+function printClientSearch() {
+
+  if (!currentClientSearchResults.length) {
+    toast('No search results to print.', true);
+    return;
+  }
+
+  const rows = currentClientSearchResults.map(c => `
+    <tr>
+      <td>${c.full_name || '—'}</td>
+      <td>${c.email || '—'}</td>
+      <td>${c.phone_number || '—'}</td>
+      <td>
+        ${c.street || ''},
+        Brgy. ${c.barangay || ''},
+        ${c.municipality || ''},
+        ${c.province || ''}
+      </td>
+    </tr>
+  `).join('');
+
+  const printWindow = window.open('', '_blank');
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Client Search Report</title>
+
+      <style>
+
+        body {
+          font-family: Arial, sans-serif;
+          padding: 30px;
+          color: #222;
+        }
+
+        h1 {
+          margin-bottom: 5px;
+        }
+
+        .subtitle {
+          color: #666;
+          margin-bottom: 20px;
+        }
+
+        .search {
+          margin-bottom: 20px;
+          font-weight: bold;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        th,
+        td {
+          border: 1px solid #ccc;
+          padding: 10px;
+          text-align: left;
+        }
+
+        th {
+          background: #f2f2f2;
+        }
+
+        @media print {
+
+          body {
+            padding: 10px;
+          }
+
+        }
+
+      </style>
+    </head>
+
+    <body>
+
+      <h1>Client Search Report</h1>
+
+      <div class="subtitle">
+        Gupana Electrical Supplies and Installation Services
+      </div>
+
+      <div class="search">
+        Search: ${currentClientSearchText}
+      </div>
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Address</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${rows}
+        </tbody>
+
+      </table>
+
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+
+  printWindow.focus();
+
+  setTimeout(() => {
+    printWindow.print();
+  }, 300);
 }
 
 /* ================= ACTIVITY LOGS ================= */
