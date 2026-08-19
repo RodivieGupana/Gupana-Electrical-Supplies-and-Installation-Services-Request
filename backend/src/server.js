@@ -32,7 +32,6 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/activity-logs', activityLogRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/client-dashboard', clientDashboardRoutes);
-app.use('/api/electricians', require('./routes/electricians'));
 
 // 404 handler
 app.use((req, res) => res.status(404).json({ error: 'Route not found.' }));
